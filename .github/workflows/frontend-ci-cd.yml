@@ -1,0 +1,68 @@
+name: Frontend CI/CD
+
+on:
+  push:
+    branches: ['main', 'dev']
+  pull_request:
+    branches: ['main', 'dev']
+
+jobs:
+  build:
+    name: Install & Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+        env:
+          VITE_API_BASE_URL: ${{ vars.VITE_API_BASE_URL }}
+
+  docker-build-push:
+    name: Build & Push Docker Image
+    needs: build
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Set image tag
+        id: vars
+        run: echo "sha_short=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          build-args: |
+            VITE_API_BASE_URL=${{ vars.VITE_API_BASE_URL }}
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/mychat-front:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/mychat-front:${{ steps.vars.outputs.sha_short }}
+
+  deploy:
+    name: Deploy to Home Server
+    needs: docker-build-push
+    if: github.ref == 'refs/heads/main'
+    runs-on: [self-hosted, minipc]
+    steps:
+      - name: Pull latest image & restart
+        run: |
+          docker compose -f /opt/mychat/docker-compose.prod.yml pull frontend
+          docker compose -f /opt/mychat/docker-compose.prod.yml up -d frontend
