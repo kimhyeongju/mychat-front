@@ -1,0 +1,28 @@
+.app {
+  max-width: 640px;
+  margin: 4rem auto;
+  padding: 2rem;
+  text-align: center;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.status {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  border-radius: 8px;
+  background: #f4f4f5;
+}
+
+.status--connected {
+  background: #dcfce7;
+}
+
+.status--disconnected {
+  background: #fee2e2;
+}
+
+.status__message {
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  color: #444;
+}
