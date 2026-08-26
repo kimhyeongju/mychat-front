@@ -1,37 +1,29 @@
-import { useEffect, useState } from 'react'
-import './App.css'
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'
+import { Routes, Route } from 'react-router-dom'
+import HomePage from './pages/HomePage'
+import LoginPage from './pages/LoginPage'
+import SignUpPage from './pages/SignUpPage'
+import FindIdPage from './pages/FindIdPage'
+import FindPasswordPage from './pages/FindPasswordPage'
+import WithdrawPage from './pages/WithdrawPage'
+import RequireAuth from './components/RequireAuth'
 
 function App() {
-  const [status, setStatus] = useState('checking...')
-  const [message, setMessage] = useState('')
-
-  useEffect(() => {
-    fetch(`${API_BASE_URL}/api/hello`)
-      .then((res) => {
-        if (!res.ok) throw new Error(`HTTP ${res.status}`)
-        return res.json()
-      })
-      .then((data) => {
-        setStatus('connected')
-        setMessage(data.message)
-      })
-      .catch((err) => {
-        setStatus('disconnected')
-        setMessage(err.message)
-      })
-  }, [])
-
   return (
-    <div className="app">
-      <h1>mychat</h1>
-      <p>프론트엔드 스캐폴드가 정상적으로 서비스되고 있습니다.</p>
-      <div className={`status status--${status}`}>
-        <strong>backend status:</strong> {status}
-        {message && <div className="status__message">{message}</div>}
-      </div>
-    </div>
+    <Routes>
+      <Route path="/" element={<HomePage />} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/signup" element={<SignUpPage />} />
+      <Route path="/find-id" element={<FindIdPage />} />
+      <Route path="/find-password" element={<FindPasswordPage />} />
+      <Route
+        path="/withdraw"
+        element={
+          <RequireAuth>
+            <WithdrawPage />
+          </RequireAuth>
+        }
+      />
+    </Routes>
   )
 }
 
