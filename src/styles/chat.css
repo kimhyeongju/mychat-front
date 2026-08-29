@@ -1,0 +1,281 @@
+.chat-shell {
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---- 방 찾기 화면 ---- */
+.nearby-page {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 24px 20px 40px;
+  width: 100%;
+}
+
+.nearby-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.nearby-header h1 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 20px;
+  margin: 0;
+}
+
+.radius-select {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.radius-chip {
+  flex: 1;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface-raised);
+  color: var(--text-muted);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: center;
+}
+
+.radius-chip.active {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.room-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 16px 0 24px;
+}
+
+.room-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  color: var(--text);
+  font-family: inherit;
+}
+
+.room-card:hover {
+  border-color: var(--accent);
+}
+
+.room-card-title {
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.room-card-meta {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.room-card-badge {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent-2);
+  white-space: nowrap;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 32px 16px;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+/* ---- 위치 권한 프라이밍 화면 ---- */
+.location-primer {
+  text-align: center;
+  padding: 20px 4px 8px;
+}
+
+.location-primer-icon {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 20px;
+}
+
+.location-primer-icon span {
+  position: absolute;
+  inset: 0;
+  border: 1px solid var(--accent);
+  border-radius: 50%;
+  opacity: 0;
+  animation: primer-pulse 2.4s ease-out infinite;
+}
+
+.location-primer-icon span:nth-child(2) {
+  animation-delay: 0.8s;
+}
+.location-primer-icon span:nth-child(3) {
+  animation-delay: 1.6s;
+}
+
+.location-primer-icon::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 12px;
+  height: 12px;
+  margin: -6px 0 0 -6px;
+  border-radius: 50%;
+  background: var(--accent-2);
+  box-shadow: 0 0 0 6px var(--accent-soft);
+}
+
+@keyframes primer-pulse {
+  0% {
+    transform: scale(0.4);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(1.4);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .location-primer-icon span {
+    animation: none;
+    display: none;
+  }
+}
+
+/* ---- 채팅방 화면 ---- */
+.room-page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.room-topbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.room-topbar-title {
+  font-weight: 700;
+  font-size: 15px;
+  flex: 1;
+}
+
+.connection-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--text-muted);
+}
+
+.connection-dot.connected {
+  background: var(--accent-2);
+}
+
+.message-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.load-more {
+  align-self: center;
+  margin-bottom: 8px;
+}
+
+.message-row {
+  display: flex;
+  flex-direction: column;
+  max-width: 78%;
+}
+
+.message-row.own {
+  align-self: flex-end;
+  align-items: flex-end;
+}
+
+.message-nickname {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 3px;
+  padding: 0 2px;
+}
+
+.message-bubble-wrap {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.message-row.own .message-bubble-wrap {
+  flex-direction: row-reverse;
+}
+
+.message-bubble {
+  padding: 10px 13px;
+  border-radius: 16px;
+  font-size: 14px;
+  line-height: 1.45;
+  word-break: break-word;
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+}
+
+.message-row.own .message-bubble {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+  border-bottom-right-radius: 4px;
+}
+
+.message-row:not(.own) .message-bubble {
+  border-bottom-left-radius: 4px;
+}
+
+.message-time {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.room-input-bar {
+  display: flex;
+  gap: 8px;
+  padding: 12px 16px;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.room-input-bar input {
+  flex: 1;
+}
