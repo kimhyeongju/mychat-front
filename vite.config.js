@@ -9,4 +9,9 @@ export default defineConfig({
   define: {
     global: 'window',
   },
+  server: {
+    // ngrok으로 터널링해서 접속할 때, Vite가 알 수 없는 호스트명 요청을 기본 차단하는 걸 허용.
+    // ngrok 무료 플랜은 재실행마다 서브도메인이 바뀌므로 와일드카드로 전체 허용.
+    allowedHosts: ['.ngrok-free.app', '.ngrok.io'],
+  },
 });
