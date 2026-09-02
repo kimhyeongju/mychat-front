@@ -40,4 +40,4 @@ docker run -p 8080:80 mychat-front
 - Secrets: `DOCKERHUB_USERNAME`, `DOCKERHUB_TOKEN`
 - Variables: `VITE_API_BASE_URL` (예: `https://api.yourdomain.com`)
 
-## mini PC TEST...
+## mini PC TEST...(dummy)
