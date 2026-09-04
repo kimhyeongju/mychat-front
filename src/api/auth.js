@@ -27,6 +27,18 @@ export function signUp({ username, password, nickname, phoneNumber, email }) {
   });
 }
 
+export async function checkUsernameAvailable(username) {
+  const params = new URLSearchParams({ username });
+  const result = await apiRequest(`/api/auth/check-username?${params}`);
+  return result.available;
+}
+
+export async function checkNicknameAvailable(nickname) {
+  const params = new URLSearchParams({ nickname });
+  const result = await apiRequest(`/api/auth/check-nickname?${params}`);
+  return result.available;
+}
+
 export async function login(username, password) {
   const tokens = await apiRequest('/api/auth/login', {
     method: 'POST',
