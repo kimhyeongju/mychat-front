@@ -2,9 +2,9 @@ name: Frontend CI/CD
 
 on:
   push:
-    branches: [ "main", "dev" ]
+    branches: ['main', 'dev']
   pull_request:
-    branches: [ "main", "dev" ]
+    branches: ['main', 'dev']
 
 jobs:
   build:
@@ -65,5 +65,5 @@ jobs:
     steps:
       - name: Pull latest image & restart
         run: |
-          docker compose -f /opt/myapp/docker-compose.prod.yml pull frontend
-          docker compose -f /opt/myapp/docker-compose.prod.yml up -d frontend
+          docker compose -f /opt/mychat/docker-compose.prod.yml pull frontend
+          docker compose -f /opt/mychat/docker-compose.prod.yml up -d frontend
