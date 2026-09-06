@@ -41,3 +41,4 @@ docker run -p 8080:80 mychat-front
 - Variables: `VITE_API_BASE_URL` (예: `https://api.yourdomain.com`)
 
 ## mini PC TEST...(dummy)
+## mini PC TEST2...(dummy)
