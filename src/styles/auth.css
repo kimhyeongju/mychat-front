@@ -1,6 +1,7 @@
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
 
-:root {
+:root,
+[data-theme='dark'] {
   --bg: #0b0b14;
   --surface: #14151f;
   --surface-raised: #1b1c29;
@@ -17,6 +18,20 @@
   --font-mono: 'JetBrains Mono', 'SFMono-Regular', monospace;
 }
 
+[data-theme='light'] {
+  --bg: #f7f7fb;
+  --surface: #ffffff;
+  --surface-raised: #f1f0f7;
+  --text: #17181f;
+  --text-muted: #68687a;
+  --accent: #5b4fe0;
+  --accent-soft: rgba(91, 79, 224, 0.1);
+  --accent-2: #12946a;
+  --danger: #d63e5c;
+  --danger-soft: rgba(214, 62, 92, 0.1);
+  --border: rgba(15, 15, 30, 0.1);
+}
+
 * {
   box-sizing: border-box;
 }
@@ -27,6 +42,9 @@ body {
   color: var(--text);
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
 }
 
 .auth-shell {
@@ -59,17 +77,36 @@ body {
   animation: radar-ping 4.8s cubic-bezier(0.2, 0.6, 0.4, 1) infinite;
 }
 
-.radar span:nth-child(1) { animation-delay: 0s; }
-.radar span:nth-child(2) { animation-delay: 1.6s; }
-.radar span:nth-child(3) { animation-delay: 3.2s; }
+.radar span:nth-child(1) {
+  animation-delay: 0s;
+}
+.radar span:nth-child(2) {
+  animation-delay: 1.6s;
+}
+.radar span:nth-child(3) {
+  animation-delay: 3.2s;
+}
 
 @keyframes radar-ping {
-  0% { width: 0; height: 0; margin: 0; opacity: 0.5; }
-  100% { width: 900px; height: 900px; margin: -450px 0 0 -450px; opacity: 0; }
+  0% {
+    width: 0;
+    height: 0;
+    margin: 0;
+    opacity: 0.5;
+  }
+  100% {
+    width: 900px;
+    height: 900px;
+    margin: -450px 0 0 -450px;
+    opacity: 0;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .radar span { animation: none; display: none; }
+  .radar span {
+    animation: none;
+    display: none;
+  }
 }
 
 .auth-card {
@@ -188,7 +225,9 @@ input.text-input::placeholder {
   font-weight: 700;
   font-family: var(--font-body);
   cursor: pointer;
-  transition: transform 0.1s ease, opacity 0.15s ease;
+  transition:
+    transform 0.1s ease,
+    opacity 0.15s ease;
 }
 
 .btn:active {
@@ -323,4 +362,30 @@ input.text-input::placeholder {
   padding: 14px 16px;
   text-align: center;
   letter-spacing: 0.02em;
+}
+
+.theme-toggle {
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 16px;
+}
+
+/* 카드/페이지 우상단에 둥둥 띄우는 형태 (Auth 화면, 방 목록 화면 등) */
+.theme-toggle--floating {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+}
+
+.theme-toggle:hover {
+  border-color: var(--accent);
 }

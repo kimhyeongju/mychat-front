@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { logout } from '../api/auth';
 import { apiRequest } from '../api/client';
 import '../App.css';
+import ThemeToggle from '../components/ThemeToggle';
 import { useAuth } from '../context/AuthContext';
 
 export default function HomePage() {
@@ -31,6 +32,7 @@ export default function HomePage() {
 
   return (
     <div className='app'>
+      <ThemeToggle />
       <h1>mychat</h1>
       <p>프론트엔드 스캐폴드가 정상적으로 서비스되고 있습니다.</p>
       <div className={`status status--${status}`}>

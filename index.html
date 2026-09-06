@@ -4,7 +4,19 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>mychat-front_test</title>
+    <title>mychat-front</title>
+    <script>
+      // React가 렌더링되기 전에 테마를 먼저 적용해서, 다크→라이트(또는 반대) 깜빡임을 방지한다.
+      (function () {
+        var saved = localStorage.getItem('mychat_theme');
+        var theme =
+          saved ||
+          (window.matchMedia('(prefers-color-scheme: light)').matches
+            ? 'light'
+            : 'dark');
+        document.documentElement.dataset.theme = theme;
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

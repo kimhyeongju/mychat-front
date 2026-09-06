@@ -1,28 +1,33 @@
 .app {
+  position: relative;
   max-width: 640px;
   margin: 4rem auto;
   padding: 2rem;
   text-align: center;
-  font-family: system-ui, -apple-system, sans-serif;
+  font-family: var(--font-body, system-ui, -apple-system, sans-serif);
+  color: var(--text);
 }
 
 .status {
   margin-top: 1.5rem;
   padding: 1rem;
   border-radius: 8px;
-  background: #f4f4f5;
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
 }
 
 .status--connected {
-  background: #dcfce7;
+  background: var(--accent-soft);
+  border-color: var(--accent-2);
 }
 
 .status--disconnected {
-  background: #fee2e2;
+  background: var(--danger-soft);
+  border-color: var(--danger);
 }
 
 .status__message {
   margin-top: 0.5rem;
   font-size: 0.9rem;
-  color: #444;
+  color: var(--text-muted);
 }

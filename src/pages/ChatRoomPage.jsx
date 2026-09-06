@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { getMessages, joinRoom } from '../api/chat';
+import ThemeToggle from '../components/ThemeToggle';
 import { useChatSocket } from '../hooks/useChatSocket';
 import '../styles/chat.css';
 import { formatClockTime } from '../utils/time';
@@ -87,6 +88,7 @@ export default function ChatRoomPage() {
           className={`connection-dot ${connected ? 'connected' : ''}`}
           title={connected ? '연결됨' : '연결 끊김'}
         />
+        <ThemeToggle floating={false} />
       </div>
 
       {error && (

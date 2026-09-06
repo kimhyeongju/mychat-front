@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { getOrCreateDirectRoom, joinRoom, listDirectRooms } from '../api/chat';
 import { searchUsers } from '../api/user';
+import ThemeToggle from '../components/ThemeToggle';
 import '../styles/chat.css';
 import { timeAgo } from '../utils/time';
 
@@ -45,6 +46,7 @@ export default function DirectMessagesPage() {
 
   return (
     <div className='chat-shell'>
+      <ThemeToggle />
       <div className='nearby-page'>
         <div className='nearby-header'>
           <h1>대화 상대</h1>

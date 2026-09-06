@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createLocationRoom, findNearbyRooms, joinRoom } from '../api/chat';
+import ThemeToggle from '../components/ThemeToggle';
 import { useGeolocation } from '../hooks/useGeolocation';
 import '../styles/chat.css';
 import { timeAgo } from '../utils/time';
@@ -62,6 +63,7 @@ export default function NearbyRoomsPage() {
 
   return (
     <div className='chat-shell'>
+      <ThemeToggle />
       <div className='nearby-page'>
         <div className='nearby-header'>
           <h1>내 주변 채팅</h1>
