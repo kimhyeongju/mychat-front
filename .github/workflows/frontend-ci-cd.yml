@@ -24,8 +24,6 @@ jobs:
 
       - name: Build
         run: npm run build
-        env:
-          VITE_API_BASE_URL: ${{ vars.VITE_API_BASE_URL }}
 
   docker-build-push:
     name: Build & Push Docker Image
@@ -50,13 +48,11 @@ jobs:
         with:
           context: .
           push: true
-          build-args: |
-            VITE_API_BASE_URL=${{ vars.VITE_API_BASE_URL }}
           tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/mychat-front:latest
-            ${{ secrets.DOCKERHUB_USERNAME }}/mychat-front:${{ steps.vars.outputs.sha_short }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/khj-playground-front:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/khj-playground-front:${{ steps.vars.outputs.sha_short }}
 
-  # 미니PC에 self-hosted runner 등록 후 활성화
+  # self-hosted runner
   deploy:
     name: Deploy to Home Server
     needs: docker-build-push
@@ -65,5 +61,5 @@ jobs:
     steps:
       - name: Pull latest image & restart
         run: |
-          docker compose -f /opt/mychat/docker-compose.prod.yml pull frontend
-          docker compose -f /opt/mychat/docker-compose.prod.yml up -d frontend
+          docker compose -f /opt/khj-playground/docker-compose.prod.yml pull frontend
+          docker compose -f /opt/khj-playground/docker-compose.prod.yml up -d frontend
