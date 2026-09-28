@@ -78,3 +78,15 @@ export async function withdraw(password) {
   });
   clearTokens();
 }
+
+export function getMe() {
+  return apiRequest('/api/auth/me', { auth: true });
+}
+
+export function updateProfile({ nickname, email }) {
+  return apiRequest('/api/auth/me', {
+    method: 'PATCH',
+    body: { nickname, email },
+    auth: true,
+  });
+}

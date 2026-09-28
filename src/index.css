@@ -109,3 +109,73 @@ code {
   padding: 4px 8px;
   background: var(--code-bg);
 }
+
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 24px;
+  gap: 16px;
+}
+
+.app-header__logo {
+  font-weight: 700;
+  font-size: 1.25rem;
+  text-decoration: none;
+  color: inherit;
+}
+
+.app-header__nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.user-menu {
+  position: relative;
+}
+
+.user-menu__trigger {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 600;
+  color: inherit;
+  padding: 8px 12px;
+  border-radius: 8px;
+}
+
+.user-menu__trigger:hover {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.user-menu__dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  min-width: 160px;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface, #fff);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+  z-index: 100;
+}
+
+.user-menu__dropdown a {
+  padding: 10px 14px;
+  text-decoration: none;
+  color: inherit;
+  white-space: nowrap;
+}
+
+.user-menu__dropdown a:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.user-menu__danger {
+  color: #d64545;
+}

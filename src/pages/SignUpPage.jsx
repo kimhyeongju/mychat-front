@@ -70,10 +70,7 @@ export default function SignUpPage() {
   };
 
   return (
-    <AuthLayout
-      title='회원가입'
-      subtitle='아이디로 로그인하고, 익명 채팅도 자유롭게 즐겨보세요.'
-    >
+    <AuthLayout title='회원가입' subtitle='Are you ready to join us?'>
       <form className='auth-form' onSubmit={handleSubmit}>
         {error && <div className='banner banner-error'>{error}</div>}
 

@@ -1,100 +1,93 @@
 import { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { logout } from '../api/auth';
+import { Link } from 'react-router-dom';
 import { apiRequest } from '../api/client';
-import '../App.css';
-import ThemeToggle from '../components/ThemeToggle';
-import { useAuth } from '../context/AuthContext';
+
+const SERVICES = [
+  {
+    key: 'chat',
+    label: '채팅',
+    emoji: '💬',
+    description: '가볍게 떠드는 공간',
+    to: null,
+  },
+  {
+    key: 'board',
+    label: '게시판',
+    emoji: '📝',
+    description: '글 쓰고 댓글 달고',
+    to: '/boards',
+  },
+  {
+    key: 'invest',
+    label: '모의 투자',
+    emoji: '📈',
+    description: '돈 안 잃는 투자 연습',
+    to: null,
+  },
+  {
+    key: 'tbd',
+    label: '준비 중',
+    emoji: '🧩',
+    description: '무엇이 좋을까?',
+    to: null,
+  },
+];
 
 export default function HomePage() {
-  const [status, setStatus] = useState('checking...');
-  const [message, setMessage] = useState('');
-  const { isAuthenticated, markLoggedOut } = useAuth();
-  const navigate = useNavigate();
+  const [status, setStatus] = useState('checking');
 
   useEffect(() => {
     apiRequest('/api/hello')
-      .then((data) => {
-        setStatus('connected');
-        setMessage(data.message);
-      })
-      .catch((err) => {
-        setStatus('disconnected');
-        setMessage(err.message);
-      });
+      .then(() => setStatus('connected'))
+      .catch(() => setStatus('disconnected'));
   }, []);
 
-  const handleLogout = async () => {
-    await logout();
-    markLoggedOut();
-    navigate('/login');
-  };
-
   return (
-    <div className='app'>
-      <ThemeToggle />
-      <h1>mychat</h1>
-      <p>프론트엔드 스캐폴드가 정상적으로 서비스되고 있습니다.</p>
-      <div className={`status status--${status}`}>
-        <strong>backend status:</strong> {status}
-        {message && <div className='status__message'>{message}</div>}
-      </div>
+    <>
+      <main className='home__main'>
+        <h1 className='home__title'>놀이터에 오신 걸 환영해요</h1>
+        <p className='home__subtitle'>마음에 드는 칸을 골라 들어가 보세요.</p>
 
-      <div
-        style={{
-          marginTop: 24,
-          display: 'flex',
-          gap: 12,
-          justifyContent: 'center',
-          flexWrap: 'wrap',
-        }}
-      >
-        <Link
-          to='/chat/nearby'
-          className='btn btn-primary'
-          style={{ textDecoration: 'none' }}
-        >
-          내 주변 채팅
-        </Link>
-        {isAuthenticated ? (
-          <>
-            <Link
-              to='/chat/direct'
-              className='btn btn-secondary'
-              style={{ textDecoration: 'none' }}
-            >
-              DM
-            </Link>
-            <button className='btn btn-secondary' onClick={handleLogout}>
-              로그아웃
-            </button>
-            <Link
-              to='/withdraw'
-              className='btn btn-secondary'
-              style={{ textDecoration: 'none' }}
-            >
-              회원 탈퇴
-            </Link>
-          </>
-        ) : (
-          <>
-            <Link
-              to='/login'
-              className='btn btn-primary'
-              style={{ textDecoration: 'none' }}
-            >
-              로그인
-            </Link>
-            <Link
-              to='/signup'
-              className='btn btn-secondary'
-              style={{ textDecoration: 'none' }}
-            >
-              회원가입
-            </Link>
-          </>
-        )}
-      </div>
-    </div>
+        <div className='service-grid'>
+          {SERVICES.map((service) =>
+            service.to ? (
+              <Link key={service.key} to={service.to} className='service-card'>
+                <span className='service-card__emoji' aria-hidden='true'>
+                  {service.emoji}
+                </span>
+                <span className='service-card__label'>{service.label}</span>
+                <span className='service-card__desc'>
+                  {service.description}
+                </span>
+              </Link>
+            ) : (
+              <div
+                key={service.key}
+                className='service-card service-card--soon'
+              >
+                <span className='service-card__emoji' aria-hidden='true'>
+                  {service.emoji}
+                </span>
+                <span className='service-card__label'>{service.label}</span>
+                <span className='service-card__desc'>
+                  {service.description}
+                </span>
+                <span className='service-card__badge'>준비 중</span>
+              </div>
+            ),
+          )}
+        </div>
+      </main>
+
+      <footer className='home__footer'>
+        <span className={`dot dot--${status}`} aria-hidden='true' />
+        서버{' '}
+        {status === 'connected'
+          ? '정상'
+          : status === 'checking'
+            ? '확인 중'
+            : '응답 없음'}
+      </footer>
+    </>
   );
 }

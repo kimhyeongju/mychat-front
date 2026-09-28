@@ -13,8 +13,8 @@ export default function AuthLayout({ title, subtitle, children }) {
       </div>
 
       <div className='auth-card'>
-        <Link to='/login' className='auth-wordmark'>
-          mychat
+        <Link to='/' className='auth-wordmark'>
+          Playground
         </Link>
         <h1 className='auth-title'>{title}</h1>
         {subtitle && <p className='auth-subtitle'>{subtitle}</p>}
