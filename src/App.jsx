@@ -1,7 +1,11 @@
 import { Route, Routes } from 'react-router-dom';
 import AppLayout from './components/AppLayout';
+import ChatLayout from './components/ChatLayout';
 import RequireAuth from './components/RequireAuth';
+import { ChatProvider } from './context/ChatContext';
 import BoardListPage from './pages/BoardListPage';
+import ChatEmptyPage from './pages/ChatEmptyPage';
+import ChatRoomPage from './pages/ChatRoomPage';
 import FindIdPage from './pages/FindIdPage';
 import FindPasswordPage from './pages/FindPasswordPage';
 import HomePage from './pages/HomePage';
@@ -12,7 +16,6 @@ import PostListPage from './pages/PostListPage';
 import ProfileEditPage from './pages/ProfileEditPage';
 import SignUpPage from './pages/SignUpPage';
 import WithdrawPage from './pages/WithdrawPage';
-
 function App() {
   return (
     <Routes>
@@ -57,6 +60,26 @@ function App() {
             </RequireAuth>
           }
         />
+
+        <Route
+          path='/chat'
+          element={
+            <ChatProvider>
+              <ChatLayout />
+            </ChatProvider>
+          }
+        >
+          <Route index element={<ChatEmptyPage />} />
+          <Route path='open/:roomId' element={<ChatRoomPage mode='open' />} />
+          <Route
+            path='dm/:roomId'
+            element={
+              <RequireAuth>
+                <ChatRoomPage mode='direct' />
+              </RequireAuth>
+            }
+          />
+        </Route>
       </Route>
 
       {/* AuthLayout을 쓰는 인증 화면 (헤더 없음) */}

@@ -142,6 +142,7 @@
   justify-content: center;
   padding: 48px 24px;
   text-align: center;
+  overflow-y: auto;
 }
 
 .home__title {
@@ -241,6 +242,7 @@
   max-width: 480px;
   margin: 0 auto;
   padding: 40px 24px;
+  overflow-y: auto;
 }
 
 .page__title {
@@ -810,4 +812,15 @@
 
 .field label {
   display: block;
+}
+
+.home {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  /* 자식(.chat)이 남은 높이를 정확히 차지할 수 있게 한다. */
+  min-height: 0;
+  height: 100vh;
+  background: var(--bg);
+  color: var(--text);
 }

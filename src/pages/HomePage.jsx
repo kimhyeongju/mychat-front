@@ -8,7 +8,7 @@ const SERVICES = [
     label: '채팅',
     emoji: '💬',
     description: '가볍게 떠드는 공간',
-    to: null,
+    to: '/chat',
   },
   {
     key: 'board',
