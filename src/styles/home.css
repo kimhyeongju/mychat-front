@@ -1,6 +1,10 @@
 @import url('./auth.css');
 
+/* ---------- 전체 레이아웃 ---------- */
+
 .home {
+  /* 100vh로 고정하지 않는다. 고정하면 모바일에서 내용이 잘린다.
+     채팅 화면만 .chat에서 자체적으로 높이를 잡는다. */
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -11,12 +15,17 @@
 /* ---------- 헤더 ---------- */
 
 .app-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
   padding: 16px 28px;
   border-bottom: 1px solid var(--border);
+  /* sticky이므로 배경이 없으면 아래 내용이 비쳐 보인다. */
+  background: var(--bg);
 }
 
 .app-header__logo {
@@ -28,6 +37,7 @@
   font-weight: 700;
   color: var(--text);
   text-decoration: none;
+  white-space: nowrap;
 }
 
 .app-header__nav {
@@ -35,6 +45,8 @@
   align-items: center;
   gap: 10px;
 }
+
+/* ---------- 버튼 ---------- */
 
 .btn-ghost,
 .btn-solid {
@@ -46,6 +58,7 @@
   font-weight: 600;
   cursor: pointer;
   text-decoration: none;
+  white-space: nowrap;
   transition:
     transform 0.12s ease,
     background-color 0.2s ease;
@@ -70,6 +83,53 @@
   transform: translateY(-1px);
 }
 
+.btn-solid:disabled,
+.btn-ghost:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-danger {
+  padding: 8px 16px;
+  border: 1px solid var(--danger);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--danger);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btn-danger:hover {
+  background: var(--danger-soft);
+}
+
+.btn-sm {
+  padding: 5px 12px;
+  font-size: 0.8rem;
+}
+
+.link-btn {
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+
+.link-btn:hover {
+  color: var(--accent);
+}
+
+.link-btn--danger:hover {
+  color: var(--danger);
+}
+
 /* ---------- 유저 드롭다운 ---------- */
 
 .user-menu {
@@ -89,6 +149,7 @@
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
+  white-space: nowrap;
 }
 
 .user-menu__trigger:hover {
@@ -132,7 +193,7 @@
   color: var(--danger);
 }
 
-/* ---------- 본문 ---------- */
+/* ---------- 홈 본문 ---------- */
 
 .home__main {
   flex: 1;
@@ -142,7 +203,6 @@
   justify-content: center;
   padding: 48px 24px;
   text-align: center;
-  overflow-y: auto;
 }
 
 .home__title {
@@ -167,12 +227,6 @@
   gap: 20px;
   width: 100%;
   max-width: 560px;
-}
-
-@media (max-width: 480px) {
-  .service-grid {
-    grid-template-columns: 1fr;
-  }
 }
 
 .service-card {
@@ -234,6 +288,35 @@
   font-weight: 600;
 }
 
+/* ---------- 푸터 ---------- */
+
+.home__footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px;
+  border-top: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+.dot {
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--text-muted);
+}
+
+.dot--connected {
+  background: var(--accent-2);
+}
+
+.dot--disconnected {
+  background: var(--danger);
+}
+
 /* ---------- 일반 페이지 레이아웃 ---------- */
 
 .page {
@@ -242,7 +325,10 @@
   max-width: 480px;
   margin: 0 auto;
   padding: 40px 24px;
-  overflow-y: auto;
+}
+
+.page--wide {
+  max-width: 760px;
 }
 
 .page__title {
@@ -251,6 +337,40 @@
   font-size: 1.6rem;
   font-weight: 700;
   color: var(--text);
+}
+
+.page__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.page__header .page__title {
+  margin: 0;
+}
+
+/* ---------- 공통 유틸 ---------- */
+
+.muted {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.empty {
+  padding: 48px 0;
+  text-align: center;
+}
+
+.tag {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 0.7rem;
+  font-weight: 700;
+  white-space: nowrap;
 }
 
 /* ---------- 폼 ---------- */
@@ -269,6 +389,7 @@
 }
 
 .field label {
+  display: block;
   font-size: 0.85rem;
   font-weight: 600;
   color: var(--text-muted);
@@ -326,76 +447,6 @@
   margin-top: 8px;
 }
 
-.btn-solid:disabled,
-.btn-ghost:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  transform: none;
-}
-
-/* ---------- 푸터 ---------- */
-
-.home__footer {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 16px;
-  border-top: 1px solid var(--border);
-  color: var(--text-muted);
-  font-size: 0.8rem;
-}
-
-.dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--text-muted);
-}
-
-.dot--connected {
-  background: var(--accent-2);
-}
-
-.dot--disconnected {
-  background: var(--danger);
-}
-
-.page--wide {
-  max-width: 760px;
-}
-
-.page__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 24px;
-}
-
-.page__header .page__title {
-  margin: 0;
-}
-
-.muted {
-  color: var(--text-muted);
-  font-size: 0.9rem;
-}
-
-.empty {
-  padding: 48px 0;
-  text-align: center;
-}
-
-.tag {
-  padding: 2px 8px;
-  border-radius: 999px;
-  background: var(--accent-soft);
-  color: var(--accent);
-  font-size: 0.7rem;
-  font-weight: 700;
-}
-
 /* ---------- 게시판 목록 ---------- */
 
 .board-list {
@@ -451,6 +502,7 @@
 
 .search-bar input {
   flex: 1;
+  min-width: 0;
   padding: 10px 14px;
   border: 1px solid var(--border);
   border-radius: 12px;
@@ -488,6 +540,7 @@
   font-size: 0.98rem;
   font-weight: 600;
   text-decoration: none;
+  word-break: break-word;
 }
 
 .post-row__title:hover {
@@ -566,27 +619,6 @@
   gap: 8px;
 }
 
-.btn-danger {
-  padding: 8px 16px;
-  border: 1px solid var(--danger);
-  border-radius: 999px;
-  background: transparent;
-  color: var(--danger);
-  font: inherit;
-  font-size: 0.9rem;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.btn-danger:hover {
-  background: var(--danger-soft);
-}
-
-.btn-sm {
-  padding: 5px 12px;
-  font-size: 0.8rem;
-}
-
 /* ---------- 첨부파일 ---------- */
 
 .attachments {
@@ -623,7 +655,9 @@
   color: var(--text);
   font: inherit;
   font-size: 0.88rem;
+  text-align: left;
   cursor: pointer;
+  word-break: break-all;
 }
 
 .attachments__item:hover {
@@ -694,26 +728,6 @@
   width: 100%;
   margin-bottom: 8px;
 }
-
-.link-btn {
-  padding: 0;
-  border: none;
-  background: none;
-  color: var(--text-muted);
-  font: inherit;
-  font-size: 0.78rem;
-  cursor: pointer;
-}
-
-.link-btn:hover {
-  color: var(--accent);
-}
-
-.link-btn--danger:hover {
-  color: var(--danger);
-}
-
-/* ---------- 댓글 입력 ---------- */
 
 .comment-form {
   margin-top: 20px;
@@ -805,22 +819,87 @@
 
 .file-item__name {
   flex: 1;
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.field label {
-  display: block;
-}
+/* ---------- 모바일 ---------- */
 
-.home {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  /* 자식(.chat)이 남은 높이를 정확히 차지할 수 있게 한다. */
-  min-height: 0;
-  height: 100vh;
-  background: var(--bg);
-  color: var(--text);
+@media (max-width: 560px) {
+  .app-header {
+    padding: 12px 16px;
+    gap: 8px;
+  }
+
+  .app-header__logo {
+    font-size: 0.95rem;
+  }
+
+  .btn-ghost,
+  .btn-solid,
+  .btn-danger {
+    padding: 7px 12px;
+    font-size: 0.82rem;
+  }
+
+  .user-menu__trigger {
+    padding: 7px 12px;
+    font-size: 0.82rem;
+  }
+
+  .home__main {
+    padding: 28px 16px;
+  }
+
+  .home__subtitle {
+    margin-bottom: 24px;
+  }
+
+  .service-grid {
+    /* 2열을 유지한다. 1열로 바꾸면 정사각형 카드가 화면을 꽉 채워
+       한 번에 하나씩만 보이게 된다. */
+    gap: 12px;
+  }
+
+  .service-card {
+    /* 정사각형 대신 세로를 줄여 네 칸이 한 화면에 들어오게 한다. */
+    aspect-ratio: auto;
+    min-height: 136px;
+    padding: 16px 10px;
+    border-radius: 18px;
+  }
+
+  .service-card__emoji {
+    font-size: 1.9rem;
+  }
+
+  .service-card__label {
+    font-size: 0.98rem;
+  }
+
+  .service-card__desc {
+    font-size: 0.72rem;
+  }
+
+  .service-card__badge {
+    top: 8px;
+    right: 8px;
+    padding: 2px 7px;
+    font-size: 0.62rem;
+  }
+
+  .page {
+    padding: 28px 16px;
+  }
+
+  .page__header {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .post__title {
+    font-size: 1.25rem;
+  }
 }
