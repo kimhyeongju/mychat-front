@@ -10,12 +10,15 @@ import FindIdPage from './pages/FindIdPage';
 import FindPasswordPage from './pages/FindPasswordPage';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
+import PortfolioListPage from './pages/PortfolioListPage';
+import PortfolioViewerPage from './pages/PortfolioViewerPage';
 import PostDetailPage from './pages/PostDetailPage';
 import PostFormPage from './pages/PostFormPage';
 import PostListPage from './pages/PostListPage';
 import ProfileEditPage from './pages/ProfileEditPage';
 import SignUpPage from './pages/SignUpPage';
 import WithdrawPage from './pages/WithdrawPage';
+
 function App() {
   return (
     <Routes>
@@ -28,6 +31,10 @@ function App() {
           path='/boards/:slug/posts/:postId'
           element={<PostDetailPage />}
         />
+
+        <Route path='/portfolio' element={<PortfolioListPage />} />
+        <Route path='/portfolio/:slug' element={<PortfolioViewerPage />} />
+
         <Route
           path='/profile'
           element={
