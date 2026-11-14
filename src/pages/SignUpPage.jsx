@@ -8,6 +8,7 @@ import {
 import AuthLayout from '../components/AuthLayout';
 import DuplicateCheckField from '../components/DuplicateCheckField';
 import PhoneVerifyField from '../components/PhoneVerifyField';
+import PasswordRules from '../components/PasswordRules';
 import { PASSWORD_HINT, validatePassword } from '../utils/password';
 
 const initialForm = {
@@ -100,6 +101,7 @@ export default function SignUpPage() {
               onChange={update('password')}
               required
             />
+            <PasswordRules password={form.password} />
           </div>
           <div className='field'>
             <label htmlFor='passwordConfirm'>비밀번호 확인</label>

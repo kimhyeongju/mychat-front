@@ -216,6 +216,29 @@ input.text-input::placeholder {
   color: var(--danger);
 }
 
+/* 비밀번호 규칙 체크리스트 */
+.pw-rules {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 12px;
+}
+
+.pw-rules__item--idle {
+  color: var(--text-muted);
+}
+
+.pw-rules__item--ok {
+  color: #2fa56b;
+}
+
+.pw-rules__item--fail {
+  color: var(--danger);
+}
+
 .btn {
   appearance: none;
   border: none;

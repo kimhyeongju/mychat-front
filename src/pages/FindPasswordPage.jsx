@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import AuthLayout from '../components/AuthLayout'
 import PhoneVerifyField from '../components/PhoneVerifyField'
 import { resetPassword } from '../api/auth'
+import PasswordRules from '../components/PasswordRules'
 import { PASSWORD_HINT, validatePassword } from '../utils/password'
 
 export default function FindPasswordPage() {
@@ -80,6 +81,7 @@ export default function FindPasswordPage() {
                 onChange={(e) => setNewPassword(e.target.value)}
                 required
               />
+              <PasswordRules password={newPassword} />
             </div>
             <div className="field">
               <label htmlFor="newPasswordConfirm">새 비밀번호 확인</label>
