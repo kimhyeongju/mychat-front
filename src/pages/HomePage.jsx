@@ -21,8 +21,8 @@ const SERVICES = [
     key: 'invest',
     label: '모의 투자',
     emoji: '📈',
-    description: '개발 중입니다...',
-    to: null,
+    description: '가상 자금으로 미국 주식 투자',
+    to: '/invest',
   },
   {
     // ★ 준비 중 -> 포트폴리오

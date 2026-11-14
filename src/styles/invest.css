@@ -1,0 +1,472 @@
+/* ---------- 모의 투자 ---------- */
+
+.invest__intro {
+  margin: -12px 0 20px;
+}
+
+.invest__title-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.invest-card {
+  margin-bottom: 20px;
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface);
+}
+
+.invest-card--cta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.invest-card--cta p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.92rem;
+}
+
+.invest-card__title {
+  margin: 0 0 14px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.invest-summary__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.invest-summary__head .invest-card__title {
+  margin: 0;
+}
+
+.invest-note {
+  margin: 12px 0 0;
+  font-size: 0.8rem;
+}
+
+/* 수치 표 */
+.invest-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 14px 20px;
+  margin: 0;
+}
+
+.invest-stats div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.invest-stats dt {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.invest-stats dd {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* 등락 색. 한국 관례(상승 빨강, 하락 파랑)를 따른다. */
+.is-up {
+  color: #e5484d;
+}
+
+.is-down {
+  color: #3b82f6;
+}
+
+.tag--warn {
+  margin-left: 6px;
+  background: rgba(245, 158, 11, 0.16);
+  color: #d97706;
+}
+
+/* 통화 토글 */
+.currency-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.currency-toggle__btn {
+  display: inline-flex;
+  padding: 3px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface-raised);
+  cursor: pointer;
+}
+
+.currency-toggle__btn span {
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.currency-toggle__btn span.is-active {
+  background: var(--accent);
+  color: #fff;
+}
+
+.currency-toggle__rate {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+/* 종목 검색 */
+.stock-search {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.stock-search .search-bar {
+  margin-bottom: 0;
+}
+
+.stock-search__results {
+  position: absolute;
+  z-index: 10;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  max-height: 320px;
+  overflow-y: auto;
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
+}
+
+.stock-search__item {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.stock-search__item:hover,
+.stock-search__item:focus-visible {
+  background: var(--surface-raised);
+  outline: none;
+}
+
+.stock-search__symbol {
+  min-width: 64px;
+  font-family: var(--font-mono);
+  font-weight: 700;
+}
+
+.stock-search__name {
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.stock-search__empty {
+  margin: 8px 0 0;
+  font-size: 0.82rem;
+}
+
+/* 표 */
+.invest-table-wrap {
+  overflow-x: auto;
+}
+
+.invest-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.invest-table th,
+.invest-table td {
+  padding: 10px 8px;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  vertical-align: middle;
+}
+
+.invest-table th {
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.invest-table .num {
+  text-align: right;
+  font-family: var(--font-mono);
+  white-space: nowrap;
+}
+
+.invest-table tr.is-me td {
+  background: var(--accent-soft);
+}
+
+.invest-table__symbol {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.invest-table__symbol:hover {
+  color: var(--accent);
+}
+
+.invest-table__name {
+  display: block;
+  font-size: 0.76rem;
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 종목 시세 */
+.quote__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.quote__symbol {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.quote__name {
+  margin: 2px 0 0;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.quote__badges {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.quote__price-row {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 16px 0;
+}
+
+.quote__price {
+  font-family: var(--font-mono);
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.quote__change {
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.quote__details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 10px 16px;
+  margin: 0;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+
+.quote__details dt {
+  font-size: 0.74rem;
+  color: var(--text-muted);
+}
+
+.quote__details dd {
+  margin: 2px 0 0;
+  font-family: var(--font-mono);
+  font-size: 0.92rem;
+  color: var(--text);
+}
+
+.quote__updated {
+  margin: 14px 0 0;
+  font-size: 0.78rem;
+}
+
+/* 주문 폼 */
+.trade-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.trade-form__side {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface-raised);
+}
+
+.trade-form__tab {
+  padding: 10px;
+  border: 0;
+  border-radius: 9px;
+  background: none;
+  color: var(--text-muted);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.trade-form__tab.is-buy {
+  background: #e5484d;
+  color: #fff;
+}
+
+.trade-form__tab.is-sell {
+  background: #3b82f6;
+  color: #fff;
+}
+
+.trade-form__qty {
+  display: flex;
+  gap: 8px;
+}
+
+.trade-form__qty input {
+  flex: 1;
+  min-width: 0;
+}
+
+.trade-form__info {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px 16px;
+  margin: 0;
+  padding: 14px;
+  border-radius: 12px;
+  background: var(--surface-raised);
+}
+
+.trade-form__info dt {
+  font-size: 0.74rem;
+  color: var(--text-muted);
+}
+
+.trade-form__info dd {
+  margin: 2px 0 0;
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  color: var(--text);
+}
+
+.trade-form__submit {
+  padding: 12px;
+  font-size: 1rem;
+}
+
+.trade-form__submit.is-buy:not(:disabled) {
+  background: #e5484d;
+  border-color: #e5484d;
+}
+
+.trade-form__submit.is-sell:not(:disabled) {
+  background: #3b82f6;
+  border-color: #3b82f6;
+}
+
+/* 거래 내역 */
+.trade-list {
+  list-style: none;
+  margin: 0 0 14px;
+  padding: 0;
+}
+
+.trade-row {
+  display: grid;
+  grid-template-columns: 44px 1fr auto auto;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.9rem;
+}
+
+.trade-row__side {
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.trade-row__side.is-buy {
+  color: #e5484d;
+}
+
+.trade-row__side.is-sell {
+  color: #3b82f6;
+}
+
+.trade-row__amount {
+  font-family: var(--font-mono);
+  white-space: nowrap;
+}
+
+.trade-row__date {
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
+
+@media (max-width: 560px) {
+  .trade-row {
+    grid-template-columns: 44px 1fr;
+  }
+
+  .trade-row__amount,
+  .trade-row__date {
+    grid-column: 2;
+  }
+
+  .invest-card--cta {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

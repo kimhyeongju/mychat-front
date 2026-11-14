@@ -23,7 +23,9 @@ src/
 ├── api/
 │   ├── client.js      fetch 래퍼, 토큰 관리, 자동 재발급
 │   ├── auth.js        인증 / 프로필 API
-│   └── board.js       게시판 API
+│   ├── board.js       게시판 API
+│   ├── chat.js        채팅 API
+│   └── invest.js      모의투자 API
 ├── components/
 │   ├── AppLayout.jsx      헤더 + Outlet 레이아웃
 │   ├── AppHeader.jsx      로고, 테마 토글, 유저 드롭다운
@@ -33,13 +35,18 @@ src/
 │   └── ThemeToggle.jsx
 ├── context/
 │   ├── AuthContext.jsx    로그인 상태와 회원 정보
-│   └── ThemeContext.jsx   다크/라이트 모드
+│   ├── ThemeContext.jsx   다크/라이트 모드
+│   ├── ChatContext.jsx    채팅방 목록과 STOMP 연결
+│   └── CurrencyContext.jsx 투자 화면 표시 통화(USD/KRW)와 환율
 ├── pages/
 │   ├── HomePage.jsx          4개 서비스 진입 화면
 │   ├── BoardListPage.jsx     게시판 목록
 │   ├── PostListPage.jsx      글 목록 (페이징, 검색)
 │   ├── PostDetailPage.jsx    글 상세 + 댓글 + 첨부
 │   ├── PostFormPage.jsx      글 작성 / 수정
+│   ├── InvestHomePage.jsx    모의투자 홈 (검색, 내 계좌, 랭킹)
+│   ├── StockPage.jsx         종목 시세 + 매수/매도
+│   ├── PortfolioPage.jsx     보유 현황, 거래 내역
 │   ├── ProfileEditPage.jsx   회원정보 수정
 │   ├── LoginPage.jsx
 │   ├── SignUpPage.jsx

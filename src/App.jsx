@@ -1,6 +1,7 @@
 import { Route, Routes } from 'react-router-dom';
 import AppLayout from './components/AppLayout';
 import ChatLayout from './components/ChatLayout';
+import InvestLayout from './components/InvestLayout';
 import RequireAuth from './components/RequireAuth';
 import { ChatProvider } from './context/ChatContext';
 import BoardListPage from './pages/BoardListPage';
@@ -9,14 +10,17 @@ import ChatRoomPage from './pages/ChatRoomPage';
 import FindIdPage from './pages/FindIdPage';
 import FindPasswordPage from './pages/FindPasswordPage';
 import HomePage from './pages/HomePage';
+import InvestHomePage from './pages/InvestHomePage';
 import LoginPage from './pages/LoginPage';
 import PortfolioListPage from './pages/PortfolioListPage';
+import PortfolioPage from './pages/PortfolioPage';
 import PortfolioViewerPage from './pages/PortfolioViewerPage';
 import PostDetailPage from './pages/PostDetailPage';
 import PostFormPage from './pages/PostFormPage';
 import PostListPage from './pages/PostListPage';
 import ProfileEditPage from './pages/ProfileEditPage';
 import SignUpPage from './pages/SignUpPage';
+import StockPage from './pages/StockPage';
 import WithdrawPage from './pages/WithdrawPage';
 
 function App() {
@@ -67,6 +71,19 @@ function App() {
             </RequireAuth>
           }
         />
+
+        <Route path='/invest' element={<InvestLayout />}>
+          <Route index element={<InvestHomePage />} />
+          <Route path='stocks/:symbol' element={<StockPage />} />
+          <Route
+            path='portfolio'
+            element={
+              <RequireAuth>
+                <PortfolioPage />
+              </RequireAuth>
+            }
+          />
+        </Route>
 
         <Route
           path='/chat'
