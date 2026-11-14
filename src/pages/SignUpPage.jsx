@@ -8,6 +8,7 @@ import {
 import AuthLayout from '../components/AuthLayout';
 import DuplicateCheckField from '../components/DuplicateCheckField';
 import PhoneVerifyField from '../components/PhoneVerifyField';
+import { PASSWORD_HINT, validatePassword } from '../utils/password';
 
 const initialForm = {
   username: '',
@@ -53,8 +54,9 @@ export default function SignUpPage() {
       setError('비밀번호가 일치하지 않습니다.');
       return;
     }
-    if (form.password.length < 8) {
-      setError('비밀번호는 8자 이상이어야 합니다.');
+    const passwordError = validatePassword(form.password);
+    if (passwordError) {
+      setError(passwordError);
       return;
     }
 
@@ -93,7 +95,7 @@ export default function SignUpPage() {
               id='password'
               type='password'
               className='text-input'
-              placeholder='8자 이상'
+              placeholder={PASSWORD_HINT}
               value={form.password}
               onChange={update('password')}
               required

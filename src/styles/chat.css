@@ -365,6 +365,36 @@
   color: var(--text-muted);
 }
 
+/* 평소에는 숨기고 메시지에 마우스를 올리거나 키보드 포커스가 갔을 때만 보여준다. */
+.message__delete {
+  flex-shrink: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--text-muted);
+  font-size: 0.66rem;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.12s;
+}
+
+.message__row:hover .message__delete,
+.message__delete:focus-visible {
+  opacity: 1;
+}
+
+.message__delete:hover {
+  color: var(--text);
+  text-decoration: underline;
+}
+
+/* 터치 기기에는 hover가 없으므로 항상 보여준다. */
+@media (hover: none) {
+  .message__delete {
+    opacity: 1;
+  }
+}
+
 /* ---------- 입력창 ---------- */
 
 .message-input {

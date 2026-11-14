@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import {
+  deleteMessage,
   getDirectMessages,
   getOpenMessages,
   getOpenRoom,
+  getStoredAnonymousId,
   markDirectRead,
 } from '../api/chat';
 import MessageInput from '../components/MessageInput';
@@ -91,6 +93,20 @@ export default function ChatRoomPage({ mode }) {
     });
   }, [connected, isDirect, roomId, subscribe, refreshDirectRooms]);
 
+  // ----- 삭제 알림 구독 -----
+  useEffect(() => {
+    if (!connected) return undefined;
+
+    const destination = isDirect
+      ? `/user/queue/dm/${roomId}/deleted`
+      : `/topic/rooms/${roomId}/deleted`;
+
+    return subscribe(destination, (event) => {
+      setMessages((prev) => prev.filter((m) => m.id !== event.messageId));
+      if (isDirect) refreshDirectRooms();
+    });
+  }, [connected, isDirect, roomId, subscribe, refreshDirectRooms]);
+
   // ----- 새 메시지 도착 시 아래로 스크롤 -----
   useEffect(() => {
     if (!stickToBottomRef.current) return;
@@ -138,6 +154,24 @@ export default function ChatRoomPage({ mode }) {
     [isDirect, publish, roomId],
   );
 
+  const handleDelete = useCallback(
+    async (message) => {
+      if (!window.confirm('이 메시지를 삭제할까요?')) return;
+      try {
+        await deleteMessage(message.id);
+        // 실시간 알림이 늦거나 연결이 끊긴 경우에도 내 화면에서는 바로 지운다.
+        setMessages((prev) => prev.filter((m) => m.id !== message.id));
+        if (isDirect) refreshDirectRooms();
+      } catch (err) {
+        setError(err.message);
+      }
+    },
+    [isDirect, refreshDirectRooms],
+  );
+
+  // 비로그인이면 익명 세션 ID가 내 메시지를 구분하는 기준이 된다.
+  const myId = user?.id ?? getStoredAnonymousId();
+
   return (
     <div className='chat-room'>
       <header className='chat-room__header'>
@@ -158,7 +192,12 @@ export default function ChatRoomPage({ mode }) {
           <p className='muted empty'>첫 메시지를 남겨보세요.</p>
         )}
 
-        <MessageList messages={messages} myId={user?.id} />
+        <MessageList
+          messages={messages}
+          myId={myId}
+          canDeleteAll={Boolean(user?.admin)}
+          onDelete={handleDelete}
+        />
       </div>
 
       <MessageInput

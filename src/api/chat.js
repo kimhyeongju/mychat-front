@@ -42,6 +42,21 @@ export function getOpenMessages(roomId, cursor) {
   return apiRequest(`/api/chat/rooms/open/${roomId}/messages${query}`);
 }
 
+// ---------- 메시지 삭제 ----------
+
+/**
+ * 오픈 채팅과 DM이 같은 경로를 쓴다.
+ * 로그인 상태면 토큰으로, 아니면 익명 세션으로 본인 여부를 확인받는다.
+ */
+export function deleteMessage(messageId) {
+  const anonymousId = getStoredAnonymousId();
+  return apiRequest(`/api/chat/messages/${messageId}`, {
+    method: 'DELETE',
+    auth: true,
+    headers: anonymousId ? { 'X-Anonymous-Id': anonymousId } : undefined,
+  });
+}
+
 // ---------- DM ----------
 
 export function getDirectRooms() {

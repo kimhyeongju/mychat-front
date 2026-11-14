@@ -65,8 +65,11 @@ async function refreshAccessToken() {
   return refreshPromise;
 }
 
-function buildRequest(path, { method, body, auth, isFormData }) {
-  const headers = {};
+function buildRequest(
+  path,
+  { method, body, auth, isFormData, extraHeaders },
+) {
+  const headers = { ...extraHeaders };
 
   // FormData는 브라우저가 boundary를 포함한 Content-Type을 직접 정해야 하므로
   // 여기서 지정하면 업로드가 깨진다.
@@ -106,18 +109,19 @@ async function parseError(response) {
  * @param {object} options
  * @param {string} options.method - HTTP 메서드
  * @param {object|FormData} options.body - 객체면 JSON 직렬화, FormData면 그대로 전송
+ * @param {object} options.headers - 추가로 실을 헤더 (예: X-Anonymous-Id)
  * @param {boolean} options.auth - true면 Authorization 헤더를 싣고, 401 시 토큰 재발급 후 1회 재시도
  */
 export async function apiRequest(
   path,
-  { method = 'GET', body, auth = false } = {},
+  { method = 'GET', body, auth = false, headers: extraHeaders } = {},
 ) {
   const isFormData = body instanceof FormData;
   const url = `${API_BASE_URL}${path}`;
 
   let response = await fetch(
     url,
-    buildRequest(path, { method, body, auth, isFormData }),
+    buildRequest(path, { method, body, auth, isFormData, extraHeaders }),
   );
 
   // access token 만료로 보이면 한 번만 재발급 후 재시도한다.
@@ -126,7 +130,7 @@ export async function apiRequest(
     if (refreshed) {
       response = await fetch(
         url,
-        buildRequest(path, { method, body, auth, isFormData }),
+        buildRequest(path, { method, body, auth, isFormData, extraHeaders }),
       );
     }
   }

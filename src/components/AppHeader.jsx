@@ -39,7 +39,8 @@ export default function AppHeader() {
   return (
     <header className='app-header'>
       <Link to='/' className='app-header__logo'>
-        <span aria-hidden='true'>🎠</span> khj playground
+        <img src='/logo.png' alt='' className='app-header__logo-img' />
+        khj playground
       </Link>
 
       <nav className='app-header__nav'>

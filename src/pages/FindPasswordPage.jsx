@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import AuthLayout from '../components/AuthLayout'
 import PhoneVerifyField from '../components/PhoneVerifyField'
 import { resetPassword } from '../api/auth'
+import { PASSWORD_HINT, validatePassword } from '../utils/password'
 
 export default function FindPasswordPage() {
   const navigate = useNavigate()
@@ -26,8 +27,9 @@ export default function FindPasswordPage() {
       setError('새 비밀번호가 일치하지 않습니다.')
       return
     }
-    if (newPassword.length < 8) {
-      setError('비밀번호는 8자 이상이어야 합니다.')
+    const passwordError = validatePassword(newPassword)
+    if (passwordError) {
+      setError(passwordError)
       return
     }
 
@@ -73,7 +75,7 @@ export default function FindPasswordPage() {
                 id="newPassword"
                 type="password"
                 className="text-input"
-                placeholder="8자 이상"
+                placeholder={PASSWORD_HINT}
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 required

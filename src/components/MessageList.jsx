@@ -24,7 +24,17 @@ function isSameDay(a, b) {
   );
 }
 
-export default function MessageList({ messages, myId }) {
+/**
+ * @param {string} myId - 내 회원 ID 또는 익명 세션 ID
+ * @param {boolean} canDeleteAll - 관리자면 true. 모든 메시지에 삭제 버튼이 보인다.
+ * @param {(message: object) => void} onDelete
+ */
+export default function MessageList({
+  messages,
+  myId,
+  canDeleteAll = false,
+  onDelete,
+}) {
   return (
     <ul className='messages'>
       {messages.map((message, index) => {
@@ -36,6 +46,7 @@ export default function MessageList({ messages, myId }) {
           showDate || !previous || previous.senderId !== message.senderId;
 
         const mine = myId != null && message.senderId === myId;
+        const deletable = Boolean(onDelete) && (mine || canDeleteAll);
 
         return (
           <li key={message.id}>
@@ -62,6 +73,15 @@ export default function MessageList({ messages, myId }) {
                 <span className='message__time'>
                   {formatTime(message.createdAt)}
                 </span>
+                {deletable && (
+                  <button
+                    type='button'
+                    className='message__delete'
+                    onClick={() => onDelete(message)}
+                  >
+                    삭제
+                  </button>
+                )}
               </div>
             </div>
           </li>
