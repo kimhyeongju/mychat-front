@@ -1,8 +1,11 @@
 import { Client } from '@stomp/stompjs';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { getStoredAnonymousId } from '../api/chat';
+import {
+  clearAnonymousSession,
+  ensureAnonymousSession,
+  getStoredAnonymousId,
+} from '../api/chat';
 import { getAccessToken } from '../api/client';
-
 function buildBrokerUrl() {
   // 같은 오리진의 /ws로 접속한다. 개발 환경에서는 Vite 프록시가 백엔드로 넘긴다.
   const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
@@ -24,31 +27,42 @@ export function useChatSocket({ enabled = true } = {}) {
   useEffect(() => {
     if (!enabled) return undefined;
 
-    const token = getAccessToken();
-    const anonymousId = getStoredAnonymousId();
-
-    // 둘 다 없으면 서버가 연결을 거부하므로 시도하지 않는다.
-    if (!token && !anonymousId) return undefined;
-
-    const connectHeaders = {};
-    if (token) connectHeaders.Authorization = `Bearer ${token}`;
-    if (anonymousId) connectHeaders['X-Anonymous-Id'] = anonymousId;
+    let established = false;
 
     const client = new Client({
       brokerURL: buildBrokerUrl(),
-      connectHeaders,
       reconnectDelay: 3000,
       heartbeatIncoming: 10000,
       heartbeatOutgoing: 10000,
+      // 재접속할 때마다 저장소의 최신 값을 읽는다.
+      // 처음 만든 헤더를 계속 쓰면 만료된 토큰이나 폐기된 익명 세션으로 무한 재시도하게 된다.
+      beforeConnect: async () => {
+        if (!getAccessToken() && !getStoredAnonymousId()) {
+          await ensureAnonymousSession().catch(() => {});
+        }
+        const headers = {};
+        const currentToken = getAccessToken();
+        const currentAnonymousId = getStoredAnonymousId();
+        if (currentToken) headers.Authorization = `Bearer ${currentToken}`;
+        if (currentAnonymousId) headers['X-Anonymous-Id'] = currentAnonymousId;
+        client.connectHeaders = headers;
+      },
       onConnect: () => {
+        established = true;
         setConnected(true);
         setError('');
       },
       onStompError: (frame) => {
+        // 접속 단계에서 거부됐다면 보관 중인 익명 세션이 서버에 없다는 뜻이다.
+        // 버려 두면 다음 재접속의 beforeConnect가 새로 발급받는다.
+        if (!established) clearAnonymousSession();
         setError(frame.headers.message ?? '연결에 실패했습니다.');
         setConnected(false);
       },
-      onWebSocketClose: () => setConnected(false),
+      onWebSocketClose: () => {
+        established = false;
+        setConnected(false);
+      },
     });
 
     client.activate();
