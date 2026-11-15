@@ -69,3 +69,23 @@ export function getLeaderboard() {
 export function getProfile(userId) {
   return apiRequest(`/api/invest/users/${encodeURIComponent(userId)}/profile`);
 }
+
+// ---------- 관심 종목 (로그인) ----------
+
+export function getWatchlist() {
+  return apiRequest('/api/invest/watchlist', { auth: true });
+}
+
+export function addWatch(symbol) {
+  return apiRequest(`/api/invest/watchlist/${encodeURIComponent(symbol)}`, {
+    method: 'PUT',
+    auth: true,
+  });
+}
+
+export function removeWatch(symbol) {
+  return apiRequest(`/api/invest/watchlist/${encodeURIComponent(symbol)}`, {
+    method: 'DELETE',
+    auth: true,
+  });
+}

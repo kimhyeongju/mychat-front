@@ -4,11 +4,13 @@ import { getAccount, getRanking, getWeekInfo } from '../api/invest';
 import CurrencyToggle from '../components/CurrencyToggle';
 import RankingNickname from '../components/RankingNickname';
 import RulesHelp from '../components/RulesHelp';
+import StarButton from '../components/StarButton';
 import StockSearch from '../components/StockSearch';
 import { useAuth } from '../context/AuthContext';
 import { useCurrency } from '../context/CurrencyContext';
+import { useWatchlist } from '../context/WatchlistContext';
 import usePolling from '../hooks/usePolling';
-import { formatRate, signClass } from '../utils/money';
+import { formatPercent, formatRate, signClass } from '../utils/money';
 
 const POLL_MS = 30_000;
 const MEDAL = { 1: '🥇', 2: '🥈', 3: '🥉' };
@@ -29,6 +31,7 @@ function formatRemaining(settlesAt, now) {
 export default function InvestHomePage() {
   const { isAuthenticated, loading: authLoading, user } = useAuth();
   const { money, signedMoney } = useCurrency();
+  const watchlist = useWatchlist();
 
   const [summary, setSummary] = useState(null);
   const [ranking, setRanking] = useState(null);
@@ -86,6 +89,7 @@ export default function InvestHomePage() {
       loadAccount();
       loadRanking();
       loadWeek();
+      watchlist.reload();
     },
     POLL_MS,
     !authLoading,
@@ -153,6 +157,55 @@ export default function InvestHomePage() {
           <Link to='/login' className='btn btn-solid btn-sm'>
             로그인
           </Link>
+        </section>
+      )}
+
+      {isAuthenticated && (
+        <section className='invest-card'>
+          <div className='invest-summary__head'>
+            <h2 className='invest-card__title'>관심 종목</h2>
+            <span className='muted'>{watchlist.items.length}/50</span>
+          </div>
+          {watchlist.loaded && watchlist.items.length === 0 ? (
+            <p className='muted empty'>
+              종목 화면이나 검색 결과의 ☆ 를 눌러 관심 종목을 담아보세요. 주간
+              초기화 뒤에도 남습니다.
+            </p>
+          ) : (
+            <div className='invest-table-wrap'>
+              <table className='invest-table'>
+                <tbody>
+                  {watchlist.items.map((w) => (
+                    <tr key={w.symbol}>
+                      <td>
+                        <Link
+                          to={`/invest/stocks/${encodeURIComponent(w.symbol)}`}
+                          className='invest-table__symbol'
+                        >
+                          {w.symbol}
+                        </Link>
+                        <span className='muted invest-table__name'>{w.name}</span>
+                      </td>
+                      <td className='num'>
+                        {w.price != null ? money(w.price) : '-'}
+                        {w.stale && w.price != null && (
+                          <span className='tag tag--warn'>지연</span>
+                        )}
+                      </td>
+                      <td className={`num ${signClass(w.change)}`}>
+                        {w.changePercent != null
+                          ? formatPercent(w.changePercent)
+                          : '-'}
+                      </td>
+                      <td className='num'>
+                        <StarButton symbol={w.symbol} name={w.name} />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </section>
       )}
 

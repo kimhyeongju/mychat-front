@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { getPortfolio, getQuote, placeTrade } from '../api/invest';
 import CurrencyToggle from '../components/CurrencyToggle';
+import StarButton from '../components/StarButton';
 import StockSearch from '../components/StockSearch';
 import { useAuth } from '../context/AuthContext';
 import { useCurrency } from '../context/CurrencyContext';
@@ -126,7 +127,10 @@ export default function StockPage() {
         <section className='invest-card quote'>
           <div className='quote__head'>
             <div>
-              <h1 className='quote__symbol'>{quote.symbol}</h1>
+              <h1 className='quote__symbol'>
+                {quote.symbol}{' '}
+                <StarButton symbol={quote.symbol} name={quote.name} />
+              </h1>
               <p className='quote__name'>{quote.name}</p>
             </div>
             <div className='quote__badges'>

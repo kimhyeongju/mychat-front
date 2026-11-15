@@ -676,3 +676,38 @@
   display: flex;
   gap: 8px;
 }
+
+/* ---------- 관심 종목 ---------- */
+.star-btn {
+  padding: 0 4px;
+  border: 0;
+  background: none;
+  color: var(--text-muted);
+  font-size: 1.15rem;
+  line-height: 1;
+  cursor: pointer;
+  vertical-align: middle;
+}
+
+.star-btn:hover {
+  color: #f5b301;
+}
+
+.star-btn.is-on {
+  color: #f5b301;
+}
+
+.stock-search__row {
+  display: flex;
+  align-items: center;
+}
+
+.stock-search__row .stock-search__item {
+  flex: 1;
+  min-width: 0;
+}
+
+.stock-search__row .star-btn {
+  flex: none;
+  margin-right: 8px;
+}

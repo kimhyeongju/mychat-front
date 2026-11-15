@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { searchSymbols } from '../api/invest';
+import StarButton from './StarButton';
 
 /**
  * 종목 검색창. 입력을 멈추고 300ms 뒤에 검색하고, 결과를 고르면 종목 화면으로 이동한다.
@@ -85,7 +86,7 @@ export default function StockSearch({ autoFocus = false }) {
       {open && results.length > 0 && (
         <ul className='stock-search__results' role='listbox'>
           {results.map((item) => (
-            <li key={item.symbol}>
+            <li key={item.symbol} className='stock-search__row'>
               <button
                 type='button'
                 className='stock-search__item'
@@ -94,6 +95,7 @@ export default function StockSearch({ autoFocus = false }) {
                 <span className='stock-search__symbol'>{item.symbol}</span>
                 <span className='stock-search__name'>{item.name}</span>
               </button>
+              <StarButton symbol={item.symbol} name={item.name} />
             </li>
           ))}
         </ul>
