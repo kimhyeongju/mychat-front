@@ -20,6 +20,7 @@ import PostFormPage from './pages/PostFormPage';
 import PostListPage from './pages/PostListPage';
 import ProfileEditPage from './pages/ProfileEditPage';
 import SignUpPage from './pages/SignUpPage';
+import UserPortfolioPage from './pages/UserPortfolioPage';
 import StockPage from './pages/StockPage';
 import WithdrawPage from './pages/WithdrawPage';
 
@@ -75,6 +76,14 @@ function App() {
         <Route path='/invest' element={<InvestLayout />}>
           <Route index element={<InvestHomePage />} />
           <Route path='stocks/:symbol' element={<StockPage />} />
+          <Route
+            path='users/:userId'
+            element={
+              <RequireAuth>
+                <UserPortfolioPage />
+              </RequireAuth>
+            }
+          />
           <Route
             path='portfolio'
             element={

@@ -470,3 +470,122 @@
     align-items: flex-start;
   }
 }
+
+/* ---------- 랭킹 닉네임 메뉴 ---------- */
+.nick-menu {
+  position: relative;
+  display: inline-block;
+}
+
+.nick-menu__trigger {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--text);
+  font: inherit;
+  text-decoration: underline dotted var(--text-muted);
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.nick-menu__trigger:hover {
+  color: var(--accent);
+}
+
+.nick-menu__list {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  min-width: 140px;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface-raised);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+}
+
+.nick-menu__list button {
+  padding: 9px 12px;
+  border: 0;
+  border-radius: 7px;
+  background: none;
+  color: var(--text);
+  font: inherit;
+  font-size: 0.88rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.nick-menu__list button:hover {
+  background: var(--accent-soft);
+}
+
+/* ---------- 비중 도넛 ---------- */
+.alloc {
+  --alloc-1: #3987e5;
+  --alloc-2: #d95926;
+  --alloc-3: #199e70;
+  --alloc-4: #c98500;
+  --alloc-5: #d55181;
+  --alloc-6: #9085e9;
+  --alloc-other: #6b6a7a;
+  --alloc-cash: #a9a8b8;
+
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  gap: 24px;
+  align-items: center;
+}
+
+[data-theme='light'] .alloc {
+  --alloc-1: #2a78d6;
+  --alloc-2: #eb6834;
+  --alloc-3: #1baf7a;
+  --alloc-4: #eda100;
+  --alloc-5: #e87ba4;
+  --alloc-6: #6250d6;
+  --alloc-other: #8d8c9c;
+  --alloc-cash: #c3c2d0;
+}
+
+.alloc-donut {
+  width: 100%;
+  max-width: 180px;
+}
+
+.alloc-donut circle {
+  transition: stroke-width 0.12s;
+}
+
+.alloc-donut__label {
+  fill: var(--text-muted);
+  font-size: 9px;
+}
+
+.alloc-donut__value {
+  fill: var(--text);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.alloc__swatch {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-right: 8px;
+  border-radius: 3px;
+}
+
+@media (max-width: 560px) {
+  .alloc {
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
+
+  .alloc__table {
+    width: 100%;
+  }
+}

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getAccount, getRanking } from '../api/invest';
 import CurrencyToggle from '../components/CurrencyToggle';
+import RankingNickname from '../components/RankingNickname';
 import StockSearch from '../components/StockSearch';
 import { useAuth } from '../context/AuthContext';
 import { useCurrency } from '../context/CurrencyContext';
@@ -130,7 +131,13 @@ export default function InvestHomePage() {
                   className={row.userId === user?.id ? 'is-me' : ''}
                 >
                   <td>{row.rank}</td>
-                  <td>{row.nickname}</td>
+                  <td>
+                    <RankingNickname
+                      userId={row.userId}
+                      nickname={row.nickname}
+                      withdrawn={row.nickname === '(탈퇴한 사용자)'}
+                    />
+                  </td>
                   <td className='num'>{money(row.equity)}</td>
                   <td className={`num ${signClass(row.returnRate)}`}>
                     {formatRate(row.returnRate)}

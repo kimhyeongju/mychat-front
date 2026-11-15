@@ -45,3 +45,10 @@ export function placeTrade({ symbol, side, quantity }) {
     auth: true,
   });
 }
+
+/** 다른 사용자의 포트폴리오(종목 비중만). 로그인 필요. */
+export function getUserPortfolio(userId) {
+  return apiRequest(`/api/invest/users/${encodeURIComponent(userId)}/portfolio`, {
+    auth: true,
+  });
+}
