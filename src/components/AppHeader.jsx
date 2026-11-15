@@ -64,6 +64,15 @@ export default function AppHeader() {
 
               {menuOpen && (
                 <div className='user-menu__dropdown' role='menu'>
+                  {user?.admin && (
+                    <Link
+                      to='/admin/users'
+                      role='menuitem'
+                      onClick={() => setMenuOpen(false)}
+                    >
+                      사용자 관리
+                    </Link>
+                  )}
                   <Link
                     to='/profile'
                     role='menuitem'

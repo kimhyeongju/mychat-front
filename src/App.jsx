@@ -2,8 +2,10 @@ import { Route, Routes } from 'react-router-dom';
 import AppLayout from './components/AppLayout';
 import ChatLayout from './components/ChatLayout';
 import InvestLayout from './components/InvestLayout';
+import RequireAdmin from './components/RequireAdmin';
 import RequireAuth from './components/RequireAuth';
 import { ChatProvider } from './context/ChatContext';
+import AdminUsersPage from './pages/AdminUsersPage';
 import BoardListPage from './pages/BoardListPage';
 import ChatEmptyPage from './pages/ChatEmptyPage';
 import ChatRoomPage from './pages/ChatRoomPage';
@@ -39,6 +41,14 @@ function App() {
           element={<PostDetailPage />}
         />
 
+        <Route
+          path='/admin/users'
+          element={
+            <RequireAdmin>
+              <AdminUsersPage />
+            </RequireAdmin>
+          }
+        />
         <Route path='/portfolio' element={<PortfolioListPage />} />
         <Route path='/portfolio/:slug' element={<PortfolioViewerPage />} />
 
