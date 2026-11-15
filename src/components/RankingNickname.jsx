@@ -4,10 +4,16 @@ import { startDirect } from '../api/chat';
 import { useAuth } from '../context/AuthContext';
 
 /**
- * 랭킹의 닉네임. 클릭하면 "포트폴리오 보기 / DM 보내기" 메뉴가 열린다.
- * 본인과 탈퇴한 사용자는 메뉴 없이 글자만 보여준다.
+ * 닉네임. 클릭하면 "포트폴리오 보기 / 프로필 보기 / DM 보내기" 메뉴가 열린다.
+ * 본인에게는 DM 과 남의 포트폴리오 대신 내 포트폴리오만 나오고, 탈퇴한 사용자는 메뉴 없이 글자만 보여준다.
+ * showPortfolio 가 false 면 포트폴리오 항목을 뺀다(이번 주 거래가 없어 보여줄 게 없는 곳 등).
  */
-export default function RankingNickname({ userId, nickname, withdrawn }) {
+export default function RankingNickname({
+  userId,
+  nickname,
+  withdrawn,
+  showPortfolio = true,
+}) {
   const { isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
@@ -30,9 +36,11 @@ export default function RankingNickname({ userId, nickname, withdrawn }) {
     };
   }, [open]);
 
-  if (withdrawn || userId === user?.id) {
+  if (withdrawn) {
     return <span>{nickname}</span>;
   }
+
+  const isMe = userId === user?.id;
 
   const requireLogin = () => {
     window.alert('로그인 후 이용할 수 있습니다.');
@@ -41,14 +49,28 @@ export default function RankingNickname({ userId, nickname, withdrawn }) {
 
   const viewPortfolio = () => {
     setOpen(false);
-    if (!isAuthenticated) return requireLogin();
+    if (isMe) {
+      navigate('/invest/portfolio');
+      return;
+    }
+    if (!isAuthenticated) {
+      requireLogin();
+      return;
+    }
     navigate(`/invest/users/${userId}`);
-    return undefined;
+  };
+
+  const viewProfile = () => {
+    setOpen(false);
+    navigate(`/invest/users/${userId}/profile`);
   };
 
   const sendDm = async () => {
     setOpen(false);
-    if (!isAuthenticated) return requireLogin();
+    if (!isAuthenticated) {
+      requireLogin();
+      return;
+    }
     setBusy(true);
     try {
       const room = await startDirect(userId);
@@ -58,7 +80,6 @@ export default function RankingNickname({ userId, nickname, withdrawn }) {
     } finally {
       setBusy(false);
     }
-    return undefined;
   };
 
   return (
@@ -75,12 +96,19 @@ export default function RankingNickname({ userId, nickname, withdrawn }) {
       </button>
       {open && (
         <div className='nick-menu__list' role='menu'>
-          <button type='button' role='menuitem' onClick={viewPortfolio}>
-            포트폴리오 보기
+          {showPortfolio && (
+            <button type='button' role='menuitem' onClick={viewPortfolio}>
+              {isMe ? '내 포트폴리오' : '포트폴리오 보기'}
+            </button>
+          )}
+          <button type='button' role='menuitem' onClick={viewProfile}>
+            프로필 보기
           </button>
-          <button type='button' role='menuitem' onClick={sendDm}>
-            DM 보내기
-          </button>
+          {!isMe && (
+            <button type='button' role='menuitem' onClick={sendDm}>
+              DM 보내기
+            </button>
+          )}
         </div>
       )}
     </span>

@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { getAccount, getRanking } from '../api/invest';
+import { getAccount, getRanking, getWeekInfo } from '../api/invest';
 import CurrencyToggle from '../components/CurrencyToggle';
 import RankingNickname from '../components/RankingNickname';
+import RulesHelp from '../components/RulesHelp';
 import StockSearch from '../components/StockSearch';
 import { useAuth } from '../context/AuthContext';
 import { useCurrency } from '../context/CurrencyContext';
@@ -10,6 +11,20 @@ import usePolling from '../hooks/usePolling';
 import { formatRate, signClass } from '../utils/money';
 
 const POLL_MS = 30_000;
+const MEDAL = { 1: '🥇', 2: '🥈', 3: '🥉' };
+
+/** "2일 3시간", "5시간 20분", "곧 마감" 처럼 남은 시간을 짧게 보여준다. */
+function formatRemaining(settlesAt, now) {
+  const ms = new Date(settlesAt).getTime() - now;
+  if (ms <= 0) return '정산 중';
+  const minutes = Math.floor(ms / 60_000);
+  const days = Math.floor(minutes / 1440);
+  const hours = Math.floor((minutes % 1440) / 60);
+  const mins = minutes % 60;
+  if (days > 0) return `${days}일 ${hours}시간`;
+  if (hours > 0) return `${hours}시간 ${mins}분`;
+  return `${mins}분`;
+}
 
 export default function InvestHomePage() {
   const { isAuthenticated, loading: authLoading, user } = useAuth();
@@ -17,6 +32,8 @@ export default function InvestHomePage() {
 
   const [summary, setSummary] = useState(null);
   const [ranking, setRanking] = useState(null);
+  const [week, setWeek] = useState(null);
+  const [now, setNow] = useState(() => Date.now());
   const [error, setError] = useState('');
 
   const loadAccount = useCallback(() => {
@@ -38,6 +55,22 @@ export default function InvestHomePage() {
       .catch((err) => setError(err.message));
   }, []);
 
+  const loadWeek = useCallback(() => {
+    getWeekInfo()
+      .then(setWeek)
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    loadWeek();
+  }, [loadWeek]);
+
+  // 정산까지 남은 시간을 1분마다 다시 계산한다.
+  useEffect(() => {
+    const t = setInterval(() => setNow(Date.now()), 60_000);
+    return () => clearInterval(t);
+  }, []);
+
   // 내 계좌 요약. 처음 들어오면 서버가 계좌를 자동으로 연다.
   useEffect(() => {
     if (!authLoading) loadAccount();
@@ -52,6 +85,7 @@ export default function InvestHomePage() {
     () => {
       loadAccount();
       loadRanking();
+      loadWeek();
     },
     POLL_MS,
     !authLoading,
@@ -122,18 +156,55 @@ export default function InvestHomePage() {
         </section>
       )}
 
+      {week?.lastWeek && week.lastWeek.winners.length > 0 && (
+        <section className='invest-card'>
+          <div className='invest-summary__head'>
+            <h2 className='invest-card__title'>
+              지난주 결과 <small className='muted'>({week.lastWeek.weekEndDate} 마감)</small>
+            </h2>
+            <span className='muted'>참여 {week.lastWeek.participantCount}명</span>
+          </div>
+          <ol className='winners'>
+            {week.lastWeek.winners.map((w) => (
+              <li key={w.userId}>
+                <span className='winners__rank'>{MEDAL[w.rank] ?? `${w.rank}위`}</span>
+                <RankingNickname
+                  userId={w.userId}
+                  nickname={w.nickname}
+                  withdrawn={w.nickname === '(탈퇴한 사용자)'}
+                  showPortfolio={false}
+                />
+                <span className={`num ${signClass(w.returnRate)}`}>
+                  {formatRate(w.returnRate)}
+                </span>
+                <span className='muted'>+{w.points}점</span>
+              </li>
+            ))}
+          </ol>
+        </section>
+      )}
+
       <section className='invest-card'>
         <div className='invest-summary__head'>
-          <h2 className='invest-card__title'>수익률 랭킹</h2>
-          {ranking && (
-            <span className='muted'>참여 {ranking.totalParticipants}명</span>
-          )}
+          <h2 className='invest-card__title'>
+            이번 주 수익률 랭킹 <RulesHelp week={week} />
+          </h2>
+          <span className='muted'>
+            {week && `마감까지 ${formatRemaining(week.settlesAt, now)}`}
+            {ranking && ` · 참여 ${ranking.totalParticipants}명`}
+            {' · '}
+            <Link to='/invest/leaderboard' className='link'>
+              누적 포인트 리더보드
+            </Link>
+          </span>
         </div>
 
         {!ranking && !error && <p className='muted'>불러오는 중...</p>}
 
         {ranking && ranking.entries.length === 0 && (
-          <p className='muted empty'>아직 참여자가 없습니다. 첫 거래를 해보세요.</p>
+          <p className='muted empty'>
+            이번 주 거래한 사람이 아직 없습니다. 첫 거래를 하면 랭킹에 올라갑니다.
+          </p>
         )}
 
         {ranking && ranking.entries.length > 0 && (

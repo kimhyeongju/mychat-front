@@ -167,8 +167,13 @@ export default function PortfolioPage() {
         ) : (
           <>
             <ul className='trade-list'>
-              {trades.map((t) => (
+              {trades.map((t, i) => (
                 <li key={t.id} className='trade-row'>
+                  {(i === 0 || trades[i - 1].weekEndDate !== t.weekEndDate) && (
+                    <span className='trade-week'>
+                      {t.weekEndDate ? `${t.weekEndDate} 마감 주` : '이전 기록'}
+                    </span>
+                  )}
                   <span
                     className={`trade-row__side ${
                       t.side === 'BUY' ? 'is-buy' : 'is-sell'

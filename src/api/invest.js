@@ -52,3 +52,20 @@ export function getUserPortfolio(userId) {
     auth: true,
   });
 }
+
+// ---------- 주간 대회 (공개) ----------
+
+/** 이번 주 마감(정산) 시각, 규칙, 지난주 결과 */
+export function getWeekInfo() {
+  return apiRequest('/api/invest/week');
+}
+
+/** 누적 포인트 순위 */
+export function getLeaderboard() {
+  return apiRequest('/api/invest/leaderboard');
+}
+
+/** 사용자 프로필: 누적 포인트, 1·2·3위 횟수, 최근 성적 */
+export function getProfile(userId) {
+  return apiRequest(`/api/invest/users/${encodeURIComponent(userId)}/profile`);
+}

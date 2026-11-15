@@ -589,3 +589,90 @@
     width: 100%;
   }
 }
+
+/* ---------- 주간 대회 ---------- */
+.rules-help {
+  position: relative;
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 6px;
+}
+
+.rules-help__btn {
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: var(--surface-raised);
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.rules-help__btn:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.rules-help__panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 30;
+  width: min(340px, 86vw);
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface-raised);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  font-size: 0.82rem;
+  font-weight: 400;
+  line-height: 1.5;
+  text-align: left;
+}
+
+.rules-help__panel h3 {
+  margin: 0 0 8px;
+  font-size: 0.9rem;
+}
+
+.rules-help__panel ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.rules-help__panel li + li {
+  margin-top: 6px;
+}
+
+.winners {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.winners li {
+  display: grid;
+  grid-template-columns: 36px 1fr auto auto;
+  align-items: center;
+  gap: 12px;
+}
+
+.trade-week {
+  grid-column: 1 / -1;
+  margin-top: 6px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.profile__actions {
+  display: flex;
+  gap: 8px;
+}
