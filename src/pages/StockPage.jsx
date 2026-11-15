@@ -163,6 +163,13 @@ export default function StockPage() {
 
           <p className='muted quote__updated'>
             {new Date(quote.updatedAt).toLocaleTimeString('ko-KR')} 기준
+            {quote.tradedAt &&
+              ` · 마지막 체결 ${new Date(quote.tradedAt).toLocaleString('ko-KR', {
+                month: 'numeric',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+              })}`}
             {!quote.marketOpen && ' · 장 마감 중에도 마지막 체결가로 거래됩니다'}
           </p>
         </section>

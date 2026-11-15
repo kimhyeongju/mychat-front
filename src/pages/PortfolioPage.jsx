@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { getPortfolio, getTrades } from '../api/invest';
 import CurrencyToggle from '../components/CurrencyToggle';
 import { useCurrency } from '../context/CurrencyContext';
+import usePolling from '../hooks/usePolling';
 import { formatRate, signClass } from '../utils/money';
 
 const PAGE_SIZE = 20;
@@ -16,11 +17,21 @@ export default function PortfolioPage() {
   const [hasMoreTrades, setHasMoreTrades] = useState(false);
   const [error, setError] = useState('');
 
-  useEffect(() => {
+  const loadPortfolio = useCallback(() => {
     getPortfolio()
-      .then(setPortfolio)
+      .then((p) => {
+        setPortfolio(p);
+        setError('');
+      })
       .catch((err) => setError(err.message));
   }, []);
+
+  useEffect(() => {
+    loadPortfolio();
+  }, [loadPortfolio]);
+
+  // 평가액은 시세에 따라 바뀌므로 30초마다 다시 받는다.
+  usePolling(loadPortfolio, 30_000);
 
   const loadTrades = useCallback((page) => {
     getTrades({ page, size: PAGE_SIZE })

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getAccount, getRanking } from '../api/invest';
 import CurrencyToggle from '../components/CurrencyToggle';
@@ -6,7 +6,10 @@ import RankingNickname from '../components/RankingNickname';
 import StockSearch from '../components/StockSearch';
 import { useAuth } from '../context/AuthContext';
 import { useCurrency } from '../context/CurrencyContext';
+import usePolling from '../hooks/usePolling';
 import { formatRate, signClass } from '../utils/money';
+
+const POLL_MS = 30_000;
 
 export default function InvestHomePage() {
   const { isAuthenticated, loading: authLoading, user } = useAuth();
@@ -16,9 +19,7 @@ export default function InvestHomePage() {
   const [ranking, setRanking] = useState(null);
   const [error, setError] = useState('');
 
-  // 내 계좌 요약. 처음 들어오면 서버가 계좌를 자동으로 연다.
-  useEffect(() => {
-    if (authLoading) return;
+  const loadAccount = useCallback(() => {
     if (!isAuthenticated) {
       setSummary(null);
       return;
@@ -26,14 +27,35 @@ export default function InvestHomePage() {
     getAccount()
       .then(setSummary)
       .catch((err) => setError(err.message));
-  }, [authLoading, isAuthenticated]);
+  }, [isAuthenticated]);
+
+  const loadRanking = useCallback(() => {
+    getRanking()
+      .then((r) => {
+        setRanking(r);
+        setError('');
+      })
+      .catch((err) => setError(err.message));
+  }, []);
+
+  // 내 계좌 요약. 처음 들어오면 서버가 계좌를 자동으로 연다.
+  useEffect(() => {
+    if (!authLoading) loadAccount();
+  }, [authLoading, loadAccount]);
 
   useEffect(() => {
-    if (authLoading) return;
-    getRanking()
-      .then(setRanking)
-      .catch((err) => setError(err.message));
-  }, [authLoading, isAuthenticated]);
+    if (!authLoading) loadRanking();
+  }, [authLoading, isAuthenticated, loadRanking]);
+
+  // 서버 랭킹 캐시가 20초라 30초마다 다시 받으면 거의 실시간으로 보인다.
+  usePolling(
+    () => {
+      loadAccount();
+      loadRanking();
+    },
+    POLL_MS,
+    !authLoading,
+  );
 
   return (
     <main className='page page--wide invest'>

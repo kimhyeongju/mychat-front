@@ -1,9 +1,10 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { startDirect } from '../api/chat';
 import { getUserPortfolio } from '../api/invest';
 import AllocationDonut from '../components/AllocationDonut';
 import { useAuth } from '../context/AuthContext';
+import usePolling from '../hooks/usePolling';
 import { formatRate, signClass } from '../utils/money';
 
 const MAX_SLICES = 6; // 이 개수를 넘는 종목은 "기타 종목"으로 묶는다.
@@ -18,13 +19,22 @@ export default function UserPortfolioPage() {
   const [data, setData] = useState(null);
   const [error, setError] = useState('');
 
+  const load = useCallback(() => {
+    getUserPortfolio(userId)
+      .then((d) => {
+        setData(d);
+        setError('');
+      })
+      .catch((err) => setError(err.message));
+  }, [userId]);
+
   useEffect(() => {
     setData(null);
     setError('');
-    getUserPortfolio(userId)
-      .then(setData)
-      .catch((err) => setError(err.message));
-  }, [userId]);
+    load();
+  }, [load]);
+
+  usePolling(load, 30_000);
 
   // 도넛 조각: 상위 종목 + 기타 + 현금. 색은 종목 순서(비중 순)에 고정된다.
   const slices = useMemo(() => {
