@@ -711,3 +711,22 @@
   flex: none;
   margin-right: 8px;
 }
+
+.split-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.split-row p {
+  margin: 4px 0 0;
+  font-size: 0.9rem;
+}
+
+.split-note {
+  margin: 12px 0 0;
+  font-size: 0.85rem;
+}

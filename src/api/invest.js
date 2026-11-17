@@ -89,3 +89,8 @@ export function removeWatch(symbol) {
     auth: true,
   });
 }
+
+/** 이번 주에 내 보유 종목에 적용된 분할/병합 조정 내역. */
+export function getSplitAdjustments() {
+  return apiRequest('/api/invest/split-adjustments', { auth: true });
+}

@@ -1,12 +1,18 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { getPortfolio, getTrades } from '../api/invest';
+import { getPortfolio, getSplitAdjustments, getTrades } from '../api/invest';
 import CurrencyToggle from '../components/CurrencyToggle';
 import { useCurrency } from '../context/CurrencyContext';
 import usePolling from '../hooks/usePolling';
 import { formatRate, signClass } from '../utils/money';
 
 const PAGE_SIZE = 20;
+
+function splitLabel(a) {
+  const n = Number(a.newRate);
+  const o = Number(a.oldRate);
+  return n > o ? `${n}대 ${o} 분할` : `${n}대 ${o} 병합`;
+}
 
 export default function PortfolioPage() {
   const { money, signedMoney } = useCurrency();
@@ -15,6 +21,7 @@ export default function PortfolioPage() {
   const [trades, setTrades] = useState([]);
   const [tradePage, setTradePage] = useState(0);
   const [hasMoreTrades, setHasMoreTrades] = useState(false);
+  const [adjustments, setAdjustments] = useState([]);
   const [error, setError] = useState('');
 
   const loadPortfolio = useCallback(() => {
@@ -32,6 +39,13 @@ export default function PortfolioPage() {
 
   // 평가액은 시세에 따라 바뀌므로 30초마다 다시 받는다.
   usePolling(loadPortfolio, 30_000);
+
+  // 분할/병합 조정은 드물어서 한 번만 받는다. 실패해도 화면의 나머지에는 영향이 없다.
+  useEffect(() => {
+    getSplitAdjustments()
+      .then(setAdjustments)
+      .catch(() => setAdjustments([]));
+  }, []);
 
   const loadTrades = useCallback((page) => {
     getTrades({ page, size: PAGE_SIZE })
@@ -157,6 +171,36 @@ export default function PortfolioPage() {
               </table>
             </div>
           )}
+        </section>
+      )}
+
+      {adjustments.length > 0 && (
+        <section className='invest-card'>
+          <h2 className='invest-card__title'>이번 주 분할·병합 조정</h2>
+          <ul className='split-list'>
+            {adjustments.map((a, i) => (
+              <li key={`${a.symbol}-${i}`} className='split-row'>
+                <strong>{a.symbol}</strong>{' '}
+                <span className='tag'>{splitLabel(a)}</span>
+                {a.skipped ? (
+                  <p className='muted'>
+                    분할 정보를 늦게 알게 되어 자동 조정하지 못했습니다. 보유 수량 {a.qtyBefore}주는 그대로입니다.
+                  </p>
+                ) : (
+                  <p className='muted'>
+                    {a.qtyBefore}주 → {a.qtyAfter}주, 평균 단가 {money(a.avgCostBefore)} →{' '}
+                    {money(a.avgCostAfter)}
+                    {Number(a.cashInLieu) > 0 && (
+                      <> · 소수 주 현금 정산 {money(a.cashInLieu)}</>
+                    )}
+                  </p>
+                )}
+              </li>
+            ))}
+          </ul>
+          <p className='muted split-note'>
+            수익률은 조정 전과 같게 유지됩니다.
+          </p>
         </section>
       )}
 
