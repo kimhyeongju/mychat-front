@@ -5,6 +5,7 @@ import CurrencyToggle from '../components/CurrencyToggle';
 import StarButton from '../components/StarButton';
 import StockSearch from '../components/StockSearch';
 import { useAuth } from '../context/AuthContext';
+import { useI18n } from '../context/LanguageContext';
 import { useCurrency } from '../context/CurrencyContext';
 import { formatPercent, signClass } from '../utils/money';
 
@@ -15,6 +16,8 @@ export default function StockPage() {
   const symbol = (rawSymbol ?? '').toUpperCase();
   const { isAuthenticated, loading: authLoading } = useAuth();
   const { money, signedMoney } = useCurrency();
+  // 주문 결과에서 t 를 변수명으로 쓰므로 번역 함수는 tr 로 받는다.
+  const { t: tr, locale } = useI18n();
 
   const [quote, setQuote] = useState(null);
   const [quoteError, setQuoteError] = useState('');
@@ -86,7 +89,7 @@ export default function StockPage() {
     e.preventDefault();
     setMessage(null);
     if (!validQty) {
-      setMessage({ type: 'error', text: '수량은 1 이상의 정수여야 합니다.' });
+      setMessage({ type: 'error', text: tr('st.qtyInvalid') });
       return;
     }
     setSubmitting(true);
@@ -95,7 +98,13 @@ export default function StockPage() {
       const t = result.trade;
       setMessage({
         type: 'ok',
-        text: `${t.side === 'BUY' ? '매수' : '매도'} 체결: ${t.symbol} ${t.quantity}주 × ${money(t.price)} = ${money(t.amount)}`,
+        text: tr('st.filled', {
+          side: t.side === 'BUY' ? tr('pf.buy') : tr('pf.sell'),
+          symbol: t.symbol,
+          qty: t.quantity,
+          price: money(t.price),
+          amount: money(t.amount),
+        }),
       });
       setQuantity('1');
       loadAccount();
@@ -110,7 +119,7 @@ export default function StockPage() {
     <main className='page page--wide invest'>
       <div className='page__header'>
         <Link to='/invest' className='btn btn-ghost btn-sm'>
-          ← 투자 홈
+          {tr('inv.backHome')}
         </Link>
         <CurrencyToggle />
       </div>
@@ -121,7 +130,7 @@ export default function StockPage() {
         <p className='form-msg form-msg--error'>{quoteError}</p>
       )}
 
-      {!quote && !quoteError && <p className='muted'>시세를 불러오는 중...</p>}
+      {!quote && !quoteError && <p className='muted'>{tr('inv.loadingQuote')}</p>}
 
       {quote && (
         <section className='invest-card quote'>
@@ -134,8 +143,8 @@ export default function StockPage() {
               <p className='quote__name'>{quote.name}</p>
             </div>
             <div className='quote__badges'>
-              <span className='tag'>{quote.marketOpen ? '장중' : '장 마감'}</span>
-              {quote.stale && <span className='tag tag--warn'>지연 시세</span>}
+              <span className='tag'>{quote.marketOpen ? tr('st.marketOpen') : tr('st.marketClosed')}</span>
+              {quote.stale && <span className='tag tag--warn'>{tr('st.staleQuote')}</span>}
             </div>
           </div>
 
@@ -148,45 +157,52 @@ export default function StockPage() {
 
           <dl className='quote__details'>
             <div>
-              <dt>시가</dt>
+              <dt>{tr('st.open')}</dt>
               <dd>{money(quote.open)}</dd>
             </div>
             <div>
-              <dt>고가</dt>
+              <dt>{tr('st.high')}</dt>
               <dd>{money(quote.high)}</dd>
             </div>
             <div>
-              <dt>저가</dt>
+              <dt>{tr('st.low')}</dt>
               <dd>{money(quote.low)}</dd>
             </div>
             <div>
-              <dt>전일 종가</dt>
+              <dt>{tr('st.prevClose')}</dt>
               <dd>{money(quote.previousClose)}</dd>
             </div>
           </dl>
 
           <p className='muted quote__updated'>
-            {new Date(quote.updatedAt).toLocaleTimeString('ko-KR')} 기준
+            {tr('st.asOf', {
+              time: new Date(quote.updatedAt).toLocaleTimeString(locale),
+            })}
             {quote.tradedAt &&
-              ` · 마지막 체결 ${new Date(quote.tradedAt).toLocaleString('ko-KR', {
-                month: 'numeric',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-              })}`}
-            {!quote.marketOpen && ' · 장 마감 중에도 마지막 체결가로 거래됩니다'}
+              tr('st.lastTrade', {
+                time: new Date(quote.tradedAt).toLocaleString(locale, {
+                  month: 'numeric',
+                  day: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit',
+                }),
+              })}
+            {!quote.marketOpen && tr('st.closedNote')}
           </p>
         </section>
       )}
 
       {quote && (
         <section className='invest-card trade'>
-          <h2 className='invest-card__title'>주문</h2>
+          <h2 className='invest-card__title'>{tr('st.order')}</h2>
 
           {!isAuthenticated ? (
             <p className='muted'>
-              거래하려면 <Link to='/login' className='link'>로그인</Link>이
-              필요합니다.
+              {tr('st.loginToTrade1')}
+              <Link to='/login' className='link'>
+                {tr('nav.login')}
+              </Link>
+              {tr('st.loginToTrade2')}
             </p>
           ) : (
             <form className='trade-form' onSubmit={handleSubmit}>
@@ -198,7 +214,7 @@ export default function StockPage() {
                   className={`trade-form__tab ${side === 'BUY' ? 'is-buy' : ''}`}
                   onClick={() => setSide('BUY')}
                 >
-                  매수
+                  {tr('pf.buy')}
                 </button>
                 <button
                   type='button'
@@ -207,12 +223,12 @@ export default function StockPage() {
                   className={`trade-form__tab ${side === 'SELL' ? 'is-sell' : ''}`}
                   onClick={() => setSide('SELL')}
                 >
-                  매도
+                  {tr('pf.sell')}
                 </button>
               </div>
 
               <div className='field'>
-                <label htmlFor='quantity'>수량</label>
+                <label htmlFor='quantity'>{tr('st.quantity')}</label>
                 <div className='trade-form__qty'>
                   <input
                     id='quantity'
@@ -232,7 +248,7 @@ export default function StockPage() {
                       onClick={() => setQuantity(String(Math.max(maxBuy, 0)))}
                       disabled={maxBuy < 1}
                     >
-                      최대 {maxBuy}주
+                      {tr('st.maxBuy', { n: maxBuy })}
                     </button>
                   )}
                   {side === 'SELL' && maxSell != null && (
@@ -242,7 +258,7 @@ export default function StockPage() {
                       onClick={() => setQuantity(String(maxSell))}
                       disabled={maxSell < 1}
                     >
-                      전량 {maxSell}주
+                      {tr('st.maxSell', { n: maxSell })}
                     </button>
                   )}
                 </div>
@@ -250,19 +266,21 @@ export default function StockPage() {
 
               <dl className='trade-form__info'>
                 <div>
-                  <dt>예상 금액</dt>
+                  <dt>{tr('st.estimated')}</dt>
                   <dd>{estimated != null ? money(estimated) : '-'}</dd>
                 </div>
                 <div>
-                  <dt>주문 가능 현금</dt>
+                  <dt>{tr('st.buyingPower')}</dt>
                   <dd>{account ? money(account.cash) : '-'}</dd>
                 </div>
                 <div>
-                  <dt>보유 수량</dt>
+                  <dt>{tr('st.owned')}</dt>
                   <dd>
-                    {account ? `${account.owned}주` : '-'}
+                    {account ? tr('pf.shares', { n: account.owned }) : '-'}
                     {account?.avgCost && (
-                      <span className='muted'> (평단 {money(account.avgCost)})</span>
+                      <span className='muted'>
+                        {tr('st.avgCostNote', { price: money(account.avgCost) })}
+                      </span>
                     )}
                   </dd>
                 </div>
@@ -286,14 +304,14 @@ export default function StockPage() {
                 disabled={submitting || !validQty || quote.stale}
               >
                 {submitting
-                  ? '처리 중...'
+                  ? tr('st.processing')
                   : side === 'BUY'
-                    ? `${validQty ? qty : ''}주 매수`
-                    : `${validQty ? qty : ''}주 매도`}
+                    ? tr('st.submitBuy', { qty: validQty ? qty : '' })
+                    : tr('st.submitSell', { qty: validQty ? qty : '' })}
               </button>
               {quote.stale && (
                 <p className='muted invest-note'>
-                  시세가 지연되어 주문을 받을 수 없습니다. 잠시 후 다시 시도해주세요.
+                  {tr('st.staleBlocked')}
                 </p>
               )}
             </form>

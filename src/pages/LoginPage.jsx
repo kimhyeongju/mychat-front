@@ -3,11 +3,13 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { login } from '../api/auth';
 import AuthLayout from '../components/AuthLayout';
 import { useAuth } from '../context/AuthContext';
+import { useI18n } from '../context/LanguageContext';
 
 export default function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { markLoggedIn } = useAuth();
+  const { t } = useI18n();
 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -30,17 +32,17 @@ export default function LoginPage() {
   };
 
   return (
-    <AuthLayout title='로그인' subtitle='로그인 후 재밌게 이용해보세요.'>
+    <AuthLayout title={t('login.title')} subtitle={t('login.subtitle')}>
       <form className='auth-form' onSubmit={handleSubmit}>
         {location.state?.signedUp && (
           <div className='banner banner-success'>
-            회원가입이 완료됐어요. 로그인해주세요.
+            {t('login.signedUp')}
           </div>
         )}
         {error && <div className='banner banner-error'>{error}</div>}
 
         <div className='field'>
-          <label htmlFor='username'>아이디</label>
+          <label htmlFor='username'>{t('login.username')}</label>
           <input
             id='username'
             className='text-input'
@@ -52,7 +54,7 @@ export default function LoginPage() {
         </div>
 
         <div className='field'>
-          <label htmlFor='password'>비밀번호</label>
+          <label htmlFor='password'>{t('login.password')}</label>
           <input
             id='password'
             type='password'
@@ -68,19 +70,19 @@ export default function LoginPage() {
           className='btn btn-primary btn-block'
           disabled={loading}
         >
-          {loading ? '로그인하는 중...' : '로그인'}
+          {loading ? t('login.submitting') : t('login.submit')}
         </button>
       </form>
 
       <div className='auth-links'>
-        <Link to='/find-id'>아이디 찾기</Link>
-        <Link to='/find-password'>비밀번호 찾기</Link>
+        <Link to='/find-id'>{t('login.findId')}</Link>
+        <Link to='/find-password'>{t('login.findPassword')}</Link>
       </div>
 
       <div className='auth-footer'>
-        아직 계정이 없으신가요?{' '}
+        {t('login.noAccount')}{' '}
         <Link to='/signup' className='link'>
-          회원가입
+          {t('nav.signup')}
         </Link>
       </div>
     </AuthLayout>

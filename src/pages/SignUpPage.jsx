@@ -9,7 +9,9 @@ import AuthLayout from '../components/AuthLayout';
 import DuplicateCheckField from '../components/DuplicateCheckField';
 import PhoneVerifyField from '../components/PhoneVerifyField';
 import PasswordRules from '../components/PasswordRules';
-import { PASSWORD_HINT, validatePassword } from '../utils/password';
+import { useI18n } from '../context/LanguageContext';
+import { validatePassword } from '../utils/password';
+import { isValidUsername } from '../utils/username';
 
 const initialForm = {
   username: '',
@@ -22,6 +24,7 @@ const initialForm = {
 
 export default function SignUpPage() {
   const navigate = useNavigate();
+  const { t } = useI18n();
   const [form, setForm] = useState(initialForm);
   const [phoneVerified, setPhoneVerified] = useState(false);
   const [usernameAvailable, setUsernameAvailable] = useState(false);
@@ -40,22 +43,22 @@ export default function SignUpPage() {
     setError('');
 
     if (!usernameAvailable) {
-      setError('아이디 중복확인을 먼저 진행해주세요.');
+      setError(t('signup.needUsernameCheck'));
       return;
     }
     if (!nicknameAvailable) {
-      setError('닉네임 중복확인을 먼저 진행해주세요.');
+      setError(t('signup.needNicknameCheck'));
       return;
     }
     if (!phoneVerified) {
-      setError('휴대폰 인증을 먼저 완료해주세요.');
+      setError(t('phone.needVerify'));
       return;
     }
     if (form.password !== form.passwordConfirm) {
-      setError('비밀번호가 일치하지 않습니다.');
+      setError(t('signup.passwordMismatch'));
       return;
     }
-    const passwordError = validatePassword(form.password);
+    const passwordError = validatePassword(form.password, t);
     if (passwordError) {
       setError(passwordError);
       return;
@@ -73,14 +76,15 @@ export default function SignUpPage() {
   };
 
   return (
-    <AuthLayout title='회원가입' subtitle='Are you ready to join us?'>
+    <AuthLayout title={t('signup.title')} subtitle={t('signup.subtitle')}>
       <form className='auth-form' onSubmit={handleSubmit}>
         {error && <div className='banner banner-error'>{error}</div>}
 
         <DuplicateCheckField
           id='username'
-          label='아이디'
-          placeholder='영문/숫자, 4~20자'
+          label={t('signup.username')}
+          placeholder={t('signup.usernamePlaceholder')}
+          validate={(v) => (isValidUsername(v) ? '' : t('username.rule'))}
           value={form.username}
           onChange={(value) =>
             setForm((prev) => ({ ...prev, username: value }))
@@ -91,12 +95,12 @@ export default function SignUpPage() {
 
         <div className='field-row'>
           <div className='field'>
-            <label htmlFor='password'>비밀번호</label>
+            <label htmlFor='password'>{t('signup.password')}</label>
             <input
               id='password'
               type='password'
               className='text-input'
-              placeholder={PASSWORD_HINT}
+              placeholder={t('pw.hint')}
               value={form.password}
               onChange={update('password')}
               required
@@ -104,7 +108,7 @@ export default function SignUpPage() {
             <PasswordRules password={form.password} />
           </div>
           <div className='field'>
-            <label htmlFor='passwordConfirm'>비밀번호 확인</label>
+            <label htmlFor='passwordConfirm'>{t('signup.passwordConfirm')}</label>
             <input
               id='passwordConfirm'
               type='password'
@@ -114,15 +118,17 @@ export default function SignUpPage() {
               required
             />
             {passwordMismatch && (
-              <span className='field-error'>비밀번호가 일치하지 않습니다.</span>
+              <span className='field-error'>
+                {t('signup.passwordMismatch')}
+              </span>
             )}
           </div>
         </div>
 
         <DuplicateCheckField
           id='nickname'
-          label='닉네임'
-          placeholder='채팅에 표시될 이름, 2~12자'
+          label={t('signup.nickname')}
+          placeholder={t('signup.nicknamePlaceholder')}
           value={form.nickname}
           onChange={(value) =>
             setForm((prev) => ({ ...prev, nickname: value }))
@@ -141,12 +147,12 @@ export default function SignUpPage() {
         />
 
         <div className='field'>
-          <label htmlFor='email'>이메일 (선택)</label>
+          <label htmlFor='email'>{t('signup.email')}</label>
           <input
             id='email'
             type='email'
             className='text-input'
-            placeholder='선택 입력'
+            placeholder={t('common.optionalInput')}
             value={form.email}
             onChange={update('email')}
           />
@@ -157,14 +163,14 @@ export default function SignUpPage() {
           className='btn btn-primary btn-block'
           disabled={loading}
         >
-          {loading ? '가입하는 중...' : '가입하기'}
+          {loading ? t('signup.submitting') : t('signup.submit')}
         </button>
       </form>
 
       <div className='auth-footer'>
-        이미 계정이 있으신가요?{' '}
+        {t('signup.haveAccount')}{' '}
         <Link to='/login' className='link'>
-          로그인
+          {t('nav.login')}
         </Link>
       </div>
     </AuthLayout>

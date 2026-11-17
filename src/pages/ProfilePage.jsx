@@ -3,11 +3,13 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { startDirect } from '../api/chat';
 import { getProfile } from '../api/invest';
 import { useAuth } from '../context/AuthContext';
+import { useI18n } from '../context/LanguageContext';
 import { formatRate, signClass } from '../utils/money';
 
 export default function ProfilePage() {
   const { userId } = useParams();
   const { user, isAuthenticated } = useAuth();
+  const { t } = useI18n();
   const navigate = useNavigate();
 
   const [data, setData] = useState(null);
@@ -38,16 +40,20 @@ export default function ProfilePage() {
       <div className='page__header'>
         <div className='invest__title-row'>
           <Link to='/invest' className='btn btn-ghost btn-sm'>
-            ← 투자 홈
+            {t('inv.backHome')}
           </Link>
           <h1 className='page__title'>
-            {data ? `${data.nickname}님의 프로필` : '프로필'}
+            {data
+              ? t('pr.title', {
+                  name: withdrawn ? t('inv.withdrawnUser') : data.nickname,
+                })
+              : t('pr.titleDefault')}
           </h1>
         </div>
         <div className='profile__actions'>
           {data && !withdrawn && isAuthenticated && !isMe && (
             <button type='button' className='btn btn-sm' onClick={sendDm}>
-              DM 보내기
+              {t('inv.menuDm')}
             </button>
           )}
           {data && !withdrawn && (isAuthenticated || isMe) && (
@@ -55,69 +61,69 @@ export default function ProfilePage() {
               to={isMe ? '/invest/portfolio' : `/invest/users/${userId}`}
               className='btn btn-ghost btn-sm'
             >
-              {isMe ? '내 포트폴리오' : '포트폴리오'}
+              {isMe ? t('inv.menuMyPortfolio') : t('up.titleDefault')}
             </Link>
           )}
         </div>
       </div>
 
       {error && <p className='form-msg form-msg--error'>{error}</p>}
-      {!data && !error && <p className='muted'>불러오는 중...</p>}
+      {!data && !error && <p className='muted'>{t('inv.loading')}</p>}
 
       {data && (
         <>
           <section className='invest-card'>
             <dl className='invest-stats'>
               <div>
-                <dt>누적 포인트</dt>
-                <dd>{data.totalPoints}점</dd>
+                <dt>{t('pr.totalPoints')}</dt>
+                <dd>{t('inv.pointsPlain', { n: data.totalPoints })}</dd>
               </div>
               <div>
-                <dt>리더보드 순위</dt>
+                <dt>{t('pr.leaderboardRank')}</dt>
                 <dd>
                   {data.leaderboardRank != null
-                    ? `${data.leaderboardRank}위`
+                    ? t('inv.rankN', { n: data.leaderboardRank })
                     : '-'}
                 </dd>
               </div>
               <div>
-                <dt>🥇 1위</dt>
-                <dd>{data.firstPlaces}회</dd>
+                <dt>{t('pr.first')}</dt>
+                <dd>{t('inv.timesN', { n: data.firstPlaces })}</dd>
               </div>
               <div>
-                <dt>🥈 2위</dt>
-                <dd>{data.secondPlaces}회</dd>
+                <dt>{t('pr.second')}</dt>
+                <dd>{t('inv.timesN', { n: data.secondPlaces })}</dd>
               </div>
               <div>
-                <dt>🥉 3위</dt>
-                <dd>{data.thirdPlaces}회</dd>
+                <dt>{t('pr.third')}</dt>
+                <dd>{t('inv.timesN', { n: data.thirdPlaces })}</dd>
               </div>
               <div>
-                <dt>참여한 주</dt>
-                <dd>{data.weeksPlayed}주</dd>
+                <dt>{t('pr.weeksPlayed')}</dt>
+                <dd>{t('inv.weeksN', { n: data.weeksPlayed })}</dd>
               </div>
             </dl>
           </section>
 
           <section className='invest-card'>
-            <h2 className='invest-card__title'>최근 주간 성적</h2>
+            <h2 className='invest-card__title'>{t('pr.recent')}</h2>
             {data.recent.length === 0 ? (
-              <p className='muted empty'>아직 정산된 주간 성적이 없습니다.</p>
+              <p className='muted empty'>{t('pr.noWeeks')}</p>
             ) : (
               <table className='invest-table'>
                 <thead>
                   <tr>
-                    <th>마감일</th>
-                    <th className='num'>순위</th>
-                    <th className='num'>수익률</th>
-                    <th className='num'>포인트</th>
+                    <th>{t('pr.colDate')}</th>
+                    <th className='num'>{t('pr.colRank')}</th>
+                    <th className='num'>{t('inv.returnRate')}</th>
+                    <th className='num'>{t('inv.colPoints')}</th>
                   </tr>
                 </thead>
                 <tbody>
                   {data.recent.map((w) => (
                     <tr key={w.weekEndDate}>
                       <td>{w.weekEndDate}</td>
-                      <td className='num'>{w.rank}위</td>
+                      <td className='num'>{t('inv.rankN', { n: w.rank })}</td>
                       <td className={`num ${signClass(w.returnRate)}`}>
                         {formatRate(w.returnRate)}
                       </td>

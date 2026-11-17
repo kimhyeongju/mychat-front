@@ -8,29 +8,33 @@ import StarButton from '../components/StarButton';
 import StockSearch from '../components/StockSearch';
 import { useAuth } from '../context/AuthContext';
 import { useCurrency } from '../context/CurrencyContext';
+import { useI18n } from '../context/LanguageContext';
 import { useWatchlist } from '../context/WatchlistContext';
 import usePolling from '../hooks/usePolling';
 import { formatPercent, formatRate, signClass } from '../utils/money';
 
 const POLL_MS = 30_000;
+// 서버가 탈퇴한 사용자의 닉네임으로 내려주는 값.
+const WITHDRAWN = '(탈퇴한 사용자)';
 const MEDAL = { 1: '🥇', 2: '🥈', 3: '🥉' };
 
-/** "2일 3시간", "5시간 20분", "곧 마감" 처럼 남은 시간을 짧게 보여준다. */
-function formatRemaining(settlesAt, now) {
+/** "2일 3시간", "5시간 20분" 처럼 남은 시간을 짧게 보여준다. */
+function formatRemaining(settlesAt, now, t) {
   const ms = new Date(settlesAt).getTime() - now;
-  if (ms <= 0) return '정산 중';
+  if (ms <= 0) return t('inv.settling');
   const minutes = Math.floor(ms / 60_000);
   const days = Math.floor(minutes / 1440);
   const hours = Math.floor((minutes % 1440) / 60);
   const mins = minutes % 60;
-  if (days > 0) return `${days}일 ${hours}시간`;
-  if (hours > 0) return `${hours}시간 ${mins}분`;
-  return `${mins}분`;
+  if (days > 0) return t('inv.remainDH', { d: days, h: hours });
+  if (hours > 0) return t('inv.remainHM', { h: hours, m: mins });
+  return t('inv.remainM', { m: mins });
 }
 
 export default function InvestHomePage() {
   const { isAuthenticated, loading: authLoading, user } = useAuth();
   const { money, signedMoney } = useCurrency();
+  const { t } = useI18n();
   const watchlist = useWatchlist();
 
   const [summary, setSummary] = useState(null);
@@ -70,8 +74,8 @@ export default function InvestHomePage() {
 
   // 정산까지 남은 시간을 1분마다 다시 계산한다.
   useEffect(() => {
-    const t = setInterval(() => setNow(Date.now()), 60_000);
-    return () => clearInterval(t);
+    const timer = setInterval(() => setNow(Date.now()), 60_000);
+    return () => clearInterval(timer);
   }, []);
 
   // 내 계좌 요약. 처음 들어오면 서버가 계좌를 자동으로 연다.
@@ -98,13 +102,12 @@ export default function InvestHomePage() {
   return (
     <main className='page page--wide invest'>
       <div className='page__header'>
-        <h1 className='page__title'>모의 투자</h1>
+        <h1 className='page__title'>{t('inv.title')}</h1>
         <CurrencyToggle />
       </div>
 
       <p className='muted invest__intro'>
-        가상 자금으로 미국 주식을 사고팔아 수익률을 겨루는 곳입니다. 실제 돈은
-        오가지 않습니다.
+        {t('inv.intro')}
       </p>
 
       <StockSearch />
@@ -115,36 +118,36 @@ export default function InvestHomePage() {
         summary && (
           <section className='invest-card invest-summary'>
             <div className='invest-summary__head'>
-              <h2 className='invest-card__title'>{user?.nickname}님의 계좌</h2>
+              <h2 className='invest-card__title'>{t('inv.accountOf', { name: user?.nickname })}</h2>
               <Link to='/invest/portfolio' className='btn btn-ghost btn-sm'>
-                보유 현황
+                {t('inv.holdings')}
               </Link>
             </div>
             <dl className='invest-stats'>
               <div>
-                <dt>총 자산</dt>
+                <dt>{t('inv.totalAssets')}</dt>
                 <dd>{money(summary.equity)}</dd>
               </div>
               <div>
-                <dt>수익률</dt>
+                <dt>{t('inv.returnRate')}</dt>
                 <dd className={signClass(summary.returnRate)}>
                   {formatRate(summary.returnRate)}
                 </dd>
               </div>
               <div>
-                <dt>평가 손익</dt>
+                <dt>{t('inv.pnl')}</dt>
                 <dd className={signClass(summary.profit)}>
                   {signedMoney(summary.profit)}
                 </dd>
               </div>
               <div>
-                <dt>현금</dt>
+                <dt>{t('inv.cash')}</dt>
                 <dd>{money(summary.cash)}</dd>
               </div>
             </dl>
             {summary.pricesStale && (
               <p className='muted invest-note'>
-                일부 종목의 시세가 최신이 아니어서 평가액이 다를 수 있습니다.
+                {t('inv.staleNote')}
               </p>
             )}
           </section>
@@ -152,10 +155,10 @@ export default function InvestHomePage() {
       ) : (
         <section className='invest-card invest-card--cta'>
           <p>
-            로그인하면 {money(100000)}의 가상 자금으로 바로 시작할 수 있습니다.
+            {t('inv.ctaLogin', { money: money(100000) })}
           </p>
           <Link to='/login' className='btn btn-solid btn-sm'>
-            로그인
+            {t('nav.login')}
           </Link>
         </section>
       )}
@@ -163,13 +166,12 @@ export default function InvestHomePage() {
       {isAuthenticated && (
         <section className='invest-card'>
           <div className='invest-summary__head'>
-            <h2 className='invest-card__title'>관심 종목</h2>
+            <h2 className='invest-card__title'>{t('inv.watchlist')}</h2>
             <span className='muted'>{watchlist.items.length}/50</span>
           </div>
           {watchlist.loaded && watchlist.items.length === 0 ? (
             <p className='muted empty'>
-              종목 화면이나 검색 결과의 ☆ 를 눌러 관심 종목을 담아보세요. 주간
-              초기화 뒤에도 남습니다.
+              {t('inv.watchlistEmpty')}
             </p>
           ) : (
             <div className='invest-table-wrap'>
@@ -189,7 +191,7 @@ export default function InvestHomePage() {
                       <td className='num'>
                         {w.price != null ? money(w.price) : '-'}
                         {w.stale && w.price != null && (
-                          <span className='tag tag--warn'>지연</span>
+                          <span className='tag tag--warn'>{t('inv.delayed')}</span>
                         )}
                       </td>
                       <td className={`num ${signClass(w.change)}`}>
@@ -213,24 +215,29 @@ export default function InvestHomePage() {
         <section className='invest-card'>
           <div className='invest-summary__head'>
             <h2 className='invest-card__title'>
-              지난주 결과 <small className='muted'>({week.lastWeek.weekEndDate} 마감)</small>
+              {t('inv.lastWeek')}{' '}
+              <small className='muted'>
+                {t('inv.closedOn', { date: week.lastWeek.weekEndDate })}
+              </small>
             </h2>
-            <span className='muted'>참여 {week.lastWeek.participantCount}명</span>
+            <span className='muted'>
+              {t('inv.participants', { n: week.lastWeek.participantCount })}
+            </span>
           </div>
           <ol className='winners'>
             {week.lastWeek.winners.map((w) => (
               <li key={w.userId}>
-                <span className='winners__rank'>{MEDAL[w.rank] ?? `${w.rank}위`}</span>
+                <span className='winners__rank'>{MEDAL[w.rank] ?? t('inv.rankN', { n: w.rank })}</span>
                 <RankingNickname
                   userId={w.userId}
                   nickname={w.nickname}
-                  withdrawn={w.nickname === '(탈퇴한 사용자)'}
+                  withdrawn={w.nickname === WITHDRAWN}
                   showPortfolio={false}
                 />
                 <span className={`num ${signClass(w.returnRate)}`}>
                   {formatRate(w.returnRate)}
                 </span>
-                <span className='muted'>+{w.points}점</span>
+                <span className='muted'>{t('inv.pointsN', { n: w.points })}</span>
               </li>
             ))}
           </ol>
@@ -240,23 +247,27 @@ export default function InvestHomePage() {
       <section className='invest-card'>
         <div className='invest-summary__head'>
           <h2 className='invest-card__title'>
-            이번 주 수익률 랭킹 <RulesHelp week={week} />
+            {t('inv.weeklyRanking')} <RulesHelp week={week} />
           </h2>
           <span className='muted'>
-            {week && `마감까지 ${formatRemaining(week.settlesAt, now)}`}
-            {ranking && ` · 참여 ${ranking.totalParticipants}명`}
+            {week &&
+              t('inv.remaining', {
+                time: formatRemaining(week.settlesAt, now, t),
+              })}
+            {ranking &&
+              ` · ${t('inv.participants', { n: ranking.totalParticipants })}`}
             {' · '}
             <Link to='/invest/leaderboard' className='link'>
-              누적 포인트 리더보드
+              {t('inv.leaderboardLink')}
             </Link>
           </span>
         </div>
 
-        {!ranking && !error && <p className='muted'>불러오는 중...</p>}
+        {!ranking && !error && <p className='muted'>{t('inv.loading')}</p>}
 
         {ranking && ranking.entries.length === 0 && (
           <p className='muted empty'>
-            이번 주 거래한 사람이 아직 없습니다. 첫 거래를 하면 랭킹에 올라갑니다.
+            {t('inv.noTradersYet')}
           </p>
         )}
 
@@ -264,10 +275,10 @@ export default function InvestHomePage() {
           <table className='invest-table'>
             <thead>
               <tr>
-                <th>순위</th>
-                <th>닉네임</th>
-                <th className='num'>총 자산</th>
-                <th className='num'>수익률</th>
+                <th>{t('inv.colRank')}</th>
+                <th>{t('inv.colNickname')}</th>
+                <th className='num'>{t('inv.totalAssets')}</th>
+                <th className='num'>{t('inv.returnRate')}</th>
               </tr>
             </thead>
             <tbody>
@@ -281,7 +292,7 @@ export default function InvestHomePage() {
                     <RankingNickname
                       userId={row.userId}
                       nickname={row.nickname}
-                      withdrawn={row.nickname === '(탈퇴한 사용자)'}
+                      withdrawn={row.nickname === WITHDRAWN}
                     />
                   </td>
                   <td className='num'>{money(row.equity)}</td>
@@ -296,7 +307,10 @@ export default function InvestHomePage() {
 
         {ranking?.me && ranking.me.rank > ranking.entries.length && (
           <p className='muted invest-note'>
-            내 순위: {ranking.me.rank}위 ({formatRate(ranking.me.returnRate)})
+            {t('inv.myRank', {
+              rank: ranking.me.rank,
+              rate: formatRate(ranking.me.returnRate),
+            })}
           </p>
         )}
       </section>

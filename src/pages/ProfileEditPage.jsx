@@ -2,11 +2,13 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { updateProfile } from '../api/auth';
 import { useAuth } from '../context/AuthContext';
+import { useI18n } from '../context/LanguageContext';
 import '../styles/home.css';
 
 export default function ProfileEditPage() {
   const { user, refreshUser } = useAuth();
   const navigate = useNavigate();
+  const { t } = useI18n();
 
   const [nickname, setNickname] = useState('');
   const [email, setEmail] = useState('');
@@ -50,25 +52,25 @@ export default function ProfileEditPage() {
 
   return (
     <main className='page'>
-      <h1 className='page__title'>회원정보 수정</h1>
+      <h1 className='page__title'>{t('profile.title')}</h1>
 
       <form className='profile-form' onSubmit={handleSubmit}>
         <div className='field'>
-          <label htmlFor='username'>아이디</label>
+          <label htmlFor='username'>{t('profile.username')}</label>
           <input id='username' value={user.username} disabled />
-          <p className='field__hint'>아이디는 변경할 수 없습니다.</p>
+          <p className='field__hint'>{t('profile.usernameHint')}</p>
         </div>
 
         <div className='field'>
-          <label htmlFor='phone'>휴대폰</label>
+          <label htmlFor='phone'>{t('profile.phone')}</label>
           <input id='phone' value={user.phoneNumber} disabled />
           <p className='field__hint'>
-            휴대폰 번호 변경은 본인 인증이 필요합니다.
+            {t('profile.phoneHint')}
           </p>
         </div>
 
         <div className='field'>
-          <label htmlFor='nickname'>닉네임</label>
+          <label htmlFor='nickname'>{t('profile.nickname')}</label>
           <input
             id='nickname'
             value={nickname}
@@ -77,22 +79,22 @@ export default function ProfileEditPage() {
             maxLength={12}
             required
           />
-          <p className='field__hint'>2~12자</p>
+          <p className='field__hint'>{t('profile.nicknameHint')}</p>
         </div>
 
         <div className='field'>
-          <label htmlFor='email'>이메일</label>
+          <label htmlFor='email'>{t('profile.email')}</label>
           <input
             id='email'
             type='email'
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder='선택 입력'
+            placeholder={t('common.optionalInput')}
           />
         </div>
 
         {error && <p className='form-msg form-msg--error'>{error}</p>}
-        {done && <p className='form-msg form-msg--ok'>저장했습니다.</p>}
+        {done && <p className='form-msg form-msg--ok'>{t('profile.saved')}</p>}
 
         <div className='profile-form__actions'>
           <button
@@ -100,14 +102,14 @@ export default function ProfileEditPage() {
             className='btn btn-ghost'
             onClick={() => navigate('/')}
           >
-            돌아가기
+            {t('common.back')}
           </button>
           <button
             type='submit'
             className='btn btn-solid'
             disabled={!dirty || saving}
           >
-            {saving ? '저장 중...' : '저장'}
+            {saving ? t('profile.saving') : t('profile.save')}
           </button>
         </div>
       </form>

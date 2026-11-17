@@ -1,40 +1,42 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { apiRequest } from '../api/client';
+import { useI18n } from '../context/LanguageContext';
 
 const SERVICES = [
   {
     key: 'chat',
-    label: '채팅',
+    label: 'home.chat',
     emoji: '💬',
-    description: '가볍게 떠드는 공간',
+    description: 'home.chatDesc',
     to: '/chat',
   },
   {
     key: 'board',
-    label: '게시판',
+    label: 'home.board',
     emoji: '📝',
-    description: '글 쓰고 댓글 달고',
+    description: 'home.boardDesc',
     to: '/boards',
   },
   {
     key: 'invest',
-    label: '모의 투자',
+    label: 'home.invest',
     emoji: '📈',
-    description: '가상 자금으로 미국 주식 투자',
+    description: 'home.investDesc',
     to: '/invest',
   },
   {
     // ★ 준비 중 -> 포트폴리오
     key: 'portfolio',
-    label: '포트폴리오',
+    label: 'home.portfolio',
     emoji: '🗂️',
-    description: '지금까지 만든 것들',
+    description: 'home.portfolioDesc',
     to: '/portfolio',
   },
 ];
 
 export default function HomePage() {
+  const { t } = useI18n();
   const [status, setStatus] = useState('checking');
 
   useEffect(() => {
@@ -46,7 +48,7 @@ export default function HomePage() {
   return (
     <>
       <main className='home__main'>
-        <h1 className='home__title'>놀이터에 오신 걸 환영해요</h1>
+        <h1 className='home__title'>{t('home.title')}</h1>
 
         <p className='home__subtitle'>
           <a
@@ -71,8 +73,8 @@ export default function HomePage() {
 
           <span className='blog-promo__body'>
             <span className='blog-promo__head'>
-              <strong className='blog-promo__title'>기술 블로그</strong>
-              <span className='blog-promo__badge'>방문 추천</span>
+              <strong className='blog-promo__title'>{t('home.blogTitle')}</strong>
+              <span className='blog-promo__badge'>{t('home.blogBadge')}</span>
 
               <span className='blog-promo__tags'>
                 <span className='blog-promo__tag'>#Spring</span>
@@ -83,7 +85,7 @@ export default function HomePage() {
             </span>
 
             <span className='blog-promo__desc'>
-              이 서버의 블로그(TISTORY)입니다. 꼭 한 번 들러보세요!!
+              {t('home.blogDesc')}
             </span>
           </span>
 
@@ -99,9 +101,9 @@ export default function HomePage() {
                 <span className='service-card__emoji' aria-hidden='true'>
                   {service.emoji}
                 </span>
-                <span className='service-card__label'>{service.label}</span>
+                <span className='service-card__label'>{t(service.label)}</span>
                 <span className='service-card__desc'>
-                  {service.description}
+                  {t(service.description)}
                 </span>
               </Link>
             ) : (
@@ -112,11 +114,11 @@ export default function HomePage() {
                 <span className='service-card__emoji' aria-hidden='true'>
                   {service.emoji}
                 </span>
-                <span className='service-card__label'>{service.label}</span>
+                <span className='service-card__label'>{t(service.label)}</span>
                 <span className='service-card__desc'>
-                  {service.description}
+                  {t(service.description)}
                 </span>
-                <span className='service-card__badge'>준비 중</span>
+                <span className='service-card__badge'>{t('home.soon')}</span>
               </div>
             ),
           )}
@@ -125,12 +127,12 @@ export default function HomePage() {
 
       <footer className='home__footer'>
         <span className={`dot dot--${status}`} aria-hidden='true' />
-        서버{' '}
+        {t('home.server')}{' '}
         {status === 'connected'
-          ? '정상'
+          ? t('home.serverOk')
           : status === 'checking'
-            ? '확인 중'
-            : '응답 없음'}
+            ? t('home.serverChecking')
+            : t('home.serverDown')}
       </footer>
     </>
   );

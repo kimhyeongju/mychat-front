@@ -9,6 +9,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { addWatch, getWatchlist, removeWatch } from '../api/invest';
 import { useAuth } from './AuthContext';
+import { useI18n } from './LanguageContext';
 
 const WatchlistContext = createContext(null);
 
@@ -19,6 +20,7 @@ const WatchlistContext = createContext(null);
 export function WatchlistProvider({ children }) {
   const { isAuthenticated, loading } = useAuth();
   const navigate = useNavigate();
+  const { t } = useI18n();
   const [items, setItems] = useState([]);
   const [loaded, setLoaded] = useState(false);
 
@@ -48,7 +50,7 @@ export function WatchlistProvider({ children }) {
   const toggle = useCallback(
     async (symbol, name) => {
       if (!isAuthenticated) {
-        window.alert('로그인 후 관심 종목을 담을 수 있습니다.');
+        window.alert(t('inv.loginForWatchlist'));
         navigate('/login');
         return;
       }
@@ -67,7 +69,7 @@ export function WatchlistProvider({ children }) {
         reload();
       }
     },
-    [isAuthenticated, items, navigate, reload],
+    [isAuthenticated, items, navigate, reload, t],
   );
 
   const value = useMemo(

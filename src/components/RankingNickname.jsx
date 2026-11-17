@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { startDirect } from '../api/chat';
 import { useAuth } from '../context/AuthContext';
+import { useI18n } from '../context/LanguageContext';
 
 /**
  * 닉네임. 클릭하면 "포트폴리오 보기 / 프로필 보기 / DM 보내기" 메뉴가 열린다.
@@ -15,6 +16,7 @@ export default function RankingNickname({
   showPortfolio = true,
 }) {
   const { isAuthenticated, user } = useAuth();
+  const { t } = useI18n();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -37,13 +39,13 @@ export default function RankingNickname({
   }, [open]);
 
   if (withdrawn) {
-    return <span>{nickname}</span>;
+    return <span>{t('inv.withdrawnUser')}</span>;
   }
 
   const isMe = userId === user?.id;
 
   const requireLogin = () => {
-    window.alert('로그인 후 이용할 수 있습니다.');
+    window.alert(t('inv.loginRequired'));
     navigate('/login');
   };
 
@@ -98,15 +100,15 @@ export default function RankingNickname({
         <div className='nick-menu__list' role='menu'>
           {showPortfolio && (
             <button type='button' role='menuitem' onClick={viewPortfolio}>
-              {isMe ? '내 포트폴리오' : '포트폴리오 보기'}
+              {isMe ? t('inv.menuMyPortfolio') : t('inv.menuViewPortfolio')}
             </button>
           )}
           <button type='button' role='menuitem' onClick={viewProfile}>
-            프로필 보기
+            {t('inv.menuProfile')}
           </button>
           {!isMe && (
             <button type='button' role='menuitem' onClick={sendDm}>
-              DM 보내기
+              {t('inv.menuDm')}
             </button>
           )}
         </div>

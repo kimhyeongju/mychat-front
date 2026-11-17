@@ -3,19 +3,22 @@ import { Link } from 'react-router-dom';
 import { getPortfolio, getSplitAdjustments, getTrades } from '../api/invest';
 import CurrencyToggle from '../components/CurrencyToggle';
 import { useCurrency } from '../context/CurrencyContext';
+import { useI18n } from '../context/LanguageContext';
 import usePolling from '../hooks/usePolling';
 import { formatRate, signClass } from '../utils/money';
 
 const PAGE_SIZE = 20;
 
-function splitLabel(a) {
+function splitLabel(a, tr) {
   const n = Number(a.newRate);
   const o = Number(a.oldRate);
-  return n > o ? `${n}대 ${o} 분할` : `${n}대 ${o} 병합`;
+  return tr(n > o ? 'pf.split' : 'pf.reverseSplit', { n, o });
 }
 
 export default function PortfolioPage() {
   const { money, signedMoney } = useCurrency();
+  // 아래 거래 목록에서 t 를 변수명으로 쓰므로 번역 함수는 tr 로 받는다.
+  const { t: tr, locale } = useI18n();
 
   const [portfolio, setPortfolio] = useState(null);
   const [trades, setTrades] = useState([]);
@@ -68,51 +71,51 @@ export default function PortfolioPage() {
       <div className='page__header'>
         <div className='invest__title-row'>
           <Link to='/invest' className='btn btn-ghost btn-sm'>
-            ← 투자 홈
+            {tr('inv.backHome')}
           </Link>
-          <h1 className='page__title'>내 포트폴리오</h1>
+          <h1 className='page__title'>{tr('pf.title')}</h1>
         </div>
         <CurrencyToggle />
       </div>
 
       {error && <p className='form-msg form-msg--error'>{error}</p>}
-      {!portfolio && !error && <p className='muted'>불러오는 중...</p>}
+      {!portfolio && !error && <p className='muted'>{tr('inv.loading')}</p>}
 
       {summary && (
         <section className='invest-card'>
           <dl className='invest-stats'>
             <div>
-              <dt>총 자산</dt>
+              <dt>{tr('inv.totalAssets')}</dt>
               <dd>{money(summary.equity)}</dd>
             </div>
             <div>
-              <dt>수익률</dt>
+              <dt>{tr('inv.returnRate')}</dt>
               <dd className={signClass(summary.returnRate)}>
                 {formatRate(summary.returnRate)}
               </dd>
             </div>
             <div>
-              <dt>평가 손익</dt>
+              <dt>{tr('inv.pnl')}</dt>
               <dd className={signClass(summary.profit)}>
                 {signedMoney(summary.profit)}
               </dd>
             </div>
             <div>
-              <dt>현금</dt>
+              <dt>{tr('inv.cash')}</dt>
               <dd>{money(summary.cash)}</dd>
             </div>
             <div>
-              <dt>주식 평가액</dt>
+              <dt>{tr('inv.holdingsValue')}</dt>
               <dd>{money(summary.holdingsValue)}</dd>
             </div>
             <div>
-              <dt>시작 자금</dt>
+              <dt>{tr('inv.seedMoney')}</dt>
               <dd>{money(summary.seedMoney)}</dd>
             </div>
           </dl>
           {summary.pricesStale && (
             <p className='muted invest-note'>
-              일부 종목의 시세가 최신이 아니어서 평가액이 다를 수 있습니다.
+              {tr('inv.staleNote')}
             </p>
           )}
         </section>
@@ -120,12 +123,12 @@ export default function PortfolioPage() {
 
       {portfolio && (
         <section className='invest-card'>
-          <h2 className='invest-card__title'>보유 종목</h2>
+          <h2 className='invest-card__title'>{tr('pf.positions')}</h2>
           {portfolio.positions.length === 0 ? (
             <p className='muted empty'>
-              보유 종목이 없습니다.{' '}
+              {tr('pf.noPositions')}{' '}
               <Link to='/invest' className='link'>
-                종목을 검색해 첫 매수를 해보세요.
+                {tr('pf.firstBuy')}
               </Link>
             </p>
           ) : (
@@ -133,12 +136,12 @@ export default function PortfolioPage() {
               <table className='invest-table'>
                 <thead>
                   <tr>
-                    <th>종목</th>
-                    <th className='num'>수량</th>
-                    <th className='num'>평균 단가</th>
-                    <th className='num'>현재가</th>
-                    <th className='num'>평가액</th>
-                    <th className='num'>손익</th>
+                    <th>{tr('pf.colSymbol')}</th>
+                    <th className='num'>{tr('pf.colQty')}</th>
+                    <th className='num'>{tr('pf.colAvgCost')}</th>
+                    <th className='num'>{tr('pf.colPrice')}</th>
+                    <th className='num'>{tr('pf.colValue')}</th>
+                    <th className='num'>{tr('pf.colPnl')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -157,7 +160,7 @@ export default function PortfolioPage() {
                       <td className='num'>{money(p.avgCost)}</td>
                       <td className='num'>
                         {p.price != null ? money(p.price) : '-'}
-                        {p.stale && <span className='tag tag--warn'>지연</span>}
+                        {p.stale && <span className='tag tag--warn'>{tr('inv.delayed')}</span>}
                       </td>
                       <td className='num'>{money(p.marketValue)}</td>
                       <td className={`num ${signClass(p.profit)}`}>
@@ -176,22 +179,26 @@ export default function PortfolioPage() {
 
       {adjustments.length > 0 && (
         <section className='invest-card'>
-          <h2 className='invest-card__title'>이번 주 분할·병합 조정</h2>
+          <h2 className='invest-card__title'>{tr('pf.splitsTitle')}</h2>
           <ul className='split-list'>
             {adjustments.map((a, i) => (
               <li key={`${a.symbol}-${i}`} className='split-row'>
                 <strong>{a.symbol}</strong>{' '}
-                <span className='tag'>{splitLabel(a)}</span>
+                <span className='tag'>{splitLabel(a, tr)}</span>
                 {a.skipped ? (
                   <p className='muted'>
-                    분할 정보를 늦게 알게 되어 자동 조정하지 못했습니다. 보유 수량 {a.qtyBefore}주는 그대로입니다.
+                    {tr('pf.splitSkipped', { qty: a.qtyBefore })}
                   </p>
                 ) : (
                   <p className='muted'>
-                    {a.qtyBefore}주 → {a.qtyAfter}주, 평균 단가 {money(a.avgCostBefore)} →{' '}
-                    {money(a.avgCostAfter)}
+                    {tr('pf.splitApplied', {
+                      before: a.qtyBefore,
+                      after: a.qtyAfter,
+                      avgBefore: money(a.avgCostBefore),
+                      avgAfter: money(a.avgCostAfter),
+                    })}
                     {Number(a.cashInLieu) > 0 && (
-                      <> · 소수 주 현금 정산 {money(a.cashInLieu)}</>
+                      <>{tr('pf.cashInLieu', { amount: money(a.cashInLieu) })}</>
                     )}
                   </p>
                 )}
@@ -199,15 +206,15 @@ export default function PortfolioPage() {
             ))}
           </ul>
           <p className='muted split-note'>
-            수익률은 조정 전과 같게 유지됩니다.
+            {tr('pf.splitNote')}
           </p>
         </section>
       )}
 
       <section className='invest-card'>
-        <h2 className='invest-card__title'>거래 내역</h2>
+        <h2 className='invest-card__title'>{tr('pf.trades')}</h2>
         {trades.length === 0 ? (
-          <p className='muted empty'>아직 거래가 없습니다.</p>
+          <p className='muted empty'>{tr('pf.noTrades')}</p>
         ) : (
           <>
             <ul className='trade-list'>
@@ -215,7 +222,9 @@ export default function PortfolioPage() {
                 <li key={t.id} className='trade-row'>
                   {(i === 0 || trades[i - 1].weekEndDate !== t.weekEndDate) && (
                     <span className='trade-week'>
-                      {t.weekEndDate ? `${t.weekEndDate} 마감 주` : '이전 기록'}
+                      {t.weekEndDate
+                        ? tr('pf.weekClosed', { date: t.weekEndDate })
+                        : tr('pf.earlier')}
                     </span>
                   )}
                   <span
@@ -223,7 +232,7 @@ export default function PortfolioPage() {
                       t.side === 'BUY' ? 'is-buy' : 'is-sell'
                     }`}
                   >
-                    {t.side === 'BUY' ? '매수' : '매도'}
+                    {t.side === 'BUY' ? tr('pf.buy') : tr('pf.sell')}
                   </span>
                   <span className='trade-row__body'>
                     <Link
@@ -232,11 +241,11 @@ export default function PortfolioPage() {
                     >
                       {t.symbol}
                     </Link>{' '}
-                    {t.quantity}주 × {money(t.price)}
+                    {tr('pf.shares', { n: t.quantity })} × {money(t.price)}
                   </span>
                   <span className='trade-row__amount'>{money(t.amount)}</span>
                   <span className='muted trade-row__date'>
-                    {new Date(t.createdAt).toLocaleString('ko-KR', {
+                    {new Date(t.createdAt).toLocaleString(locale, {
                       month: 'numeric',
                       day: 'numeric',
                       hour: '2-digit',
@@ -252,7 +261,7 @@ export default function PortfolioPage() {
                 className='btn btn-ghost'
                 onClick={() => loadTrades(tradePage + 1)}
               >
-                더 보기
+                {tr('pf.more')}
               </button>
             )}
           </>

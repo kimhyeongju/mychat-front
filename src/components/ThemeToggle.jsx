@@ -1,15 +1,18 @@
+import { useI18n } from '../context/LanguageContext';
 import { useTheme } from '../context/ThemeContext';
 
 export default function ThemeToggle({ floating = true }) {
   const { theme, toggleTheme } = useTheme();
+  const { t } = useI18n();
+  const label = theme === 'dark' ? t('theme.toLight') : t('theme.toDark');
 
   return (
     <button
       type='button'
       className={`theme-toggle ${floating ? 'theme-toggle--floating' : ''}`}
       onClick={toggleTheme}
-      aria-label={theme === 'dark' ? '라이트 모드로 전환' : '다크 모드로 전환'}
-      title={theme === 'dark' ? '라이트 모드로 전환' : '다크 모드로 전환'}
+      aria-label={label}
+      title={label}
     >
       {theme === 'dark' ? '☀️' : '🌙'}
     </button>

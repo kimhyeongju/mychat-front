@@ -1,9 +1,11 @@
 import { Link } from 'react-router-dom';
+import LanguageToggle from './LanguageToggle';
 import ThemeToggle from './ThemeToggle';
 
 export default function AuthLayout({ title, subtitle, children }) {
   return (
     <div className='auth-shell'>
+      <LanguageToggle />
       <ThemeToggle />
 
       <div className='radar' aria-hidden='true'>

@@ -3,9 +3,11 @@ import { Link, useNavigate } from 'react-router-dom'
 import AuthLayout from '../components/AuthLayout'
 import { withdraw } from '../api/auth'
 import { useAuth } from '../context/AuthContext'
+import { useI18n } from '../context/LanguageContext'
 
 export default function WithdrawPage() {
   const navigate = useNavigate()
+  const { t } = useI18n()
   const { markLoggedOut } = useAuth()
   const [password, setPassword] = useState('')
   const [confirmChecked, setConfirmChecked] = useState(false)
@@ -17,7 +19,7 @@ export default function WithdrawPage() {
     setError('')
 
     if (!confirmChecked) {
-      setError('안내 사항을 확인하고 체크해주세요.')
+      setError(t('withdraw.needAgree'))
       return
     }
 
@@ -34,17 +36,17 @@ export default function WithdrawPage() {
   }
 
   return (
-    <AuthLayout title="회원 탈퇴" subtitle="탈퇴하면 채팅 기록과 계정 정보가 모두 삭제되며, 되돌릴 수 없어요.">
+    <AuthLayout title={t('withdraw.title')} subtitle={t('withdraw.subtitle')}>
       <form className="auth-form" onSubmit={handleSubmit}>
         {error && <div className="banner banner-error">{error}</div>}
 
         <div className="field">
-          <label htmlFor="password">비밀번호 확인</label>
+          <label htmlFor="password">{t('withdraw.password')}</label>
           <input
             id="password"
             type="password"
             className="text-input"
-            placeholder="본인 확인을 위해 비밀번호를 입력해주세요"
+            placeholder={t('withdraw.passwordPlaceholder')}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
@@ -58,16 +60,16 @@ export default function WithdrawPage() {
             onChange={(e) => setConfirmChecked(e.target.checked)}
             style={{ marginTop: 2 }}
           />
-          탈퇴 시 모든 데이터가 삭제되며 복구할 수 없다는 점을 확인했습니다.
+          {t('withdraw.agree')}
         </label>
 
         <button type="submit" className="btn btn-danger btn-block" disabled={loading}>
-          {loading ? '처리하는 중...' : '탈퇴하기'}
+          {loading ? t('withdraw.submitting') : t('withdraw.submit')}
         </button>
       </form>
 
       <div className="auth-footer">
-        <Link to="/" className="link">취소하고 돌아가기</Link>
+        <Link to="/" className="link">{t('withdraw.cancel')}</Link>
       </div>
     </AuthLayout>
   )

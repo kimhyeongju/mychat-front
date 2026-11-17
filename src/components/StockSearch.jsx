@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { searchSymbols } from '../api/invest';
+import { useI18n } from '../context/LanguageContext';
 import StarButton from './StarButton';
 
 /**
@@ -9,6 +10,7 @@ import StarButton from './StarButton';
  */
 export default function StockSearch({ autoFocus = false }) {
   const navigate = useNavigate();
+  const { t } = useI18n();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
   const [open, setOpen] = useState(false);
@@ -68,7 +70,7 @@ export default function StockSearch({ autoFocus = false }) {
       <form className='search-bar' onSubmit={handleSubmit}>
         <input
           type='search'
-          placeholder='종목명 또는 티커 (예: Apple, AAPL)'
+          placeholder={t('inv.searchPlaceholder')}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => results.length > 0 && setOpen(true)}
@@ -77,7 +79,7 @@ export default function StockSearch({ autoFocus = false }) {
           spellCheck={false}
         />
         <button type='submit' className='btn btn-ghost'>
-          검색
+          {t('inv.search')}
         </button>
       </form>
 
@@ -103,7 +105,7 @@ export default function StockSearch({ autoFocus = false }) {
 
       {open && query.trim() && results.length === 0 && !error && (
         <p className='muted stock-search__empty'>
-          검색 결과가 없습니다. 티커를 정확히 알면 그대로 입력하고 엔터를 누르세요.
+          {t('inv.searchEmpty')}
         </p>
       )}
     </div>

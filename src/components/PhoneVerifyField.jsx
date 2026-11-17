@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { sendPhoneCode, verifyPhoneCode } from '../api/auth';
+import { useI18n } from '../context/LanguageContext';
 
 const CODE_TTL_SECONDS = 5 * 60;
 const RESEND_COOLDOWN_SECONDS = 60;
@@ -22,6 +23,7 @@ export default function PhoneVerifyField({
   verified,
   onVerified,
 }) {
+  const { t } = useI18n();
   const [step, setStep] = useState('idle'); // idle | sent
   const [code, setCode] = useState('');
   const [secondsLeft, setSecondsLeft] = useState(0);
@@ -59,7 +61,7 @@ export default function PhoneVerifyField({
 
   const handleSendCode = async () => {
     if (!isValidPhone) {
-      setError('휴대폰 번호를 하이픈 없이 정확히 입력해주세요.');
+      setError(t('phone.invalid'));
       return;
     }
     setError('');
@@ -78,7 +80,7 @@ export default function PhoneVerifyField({
 
   const handleVerifyCode = async () => {
     if (code.length !== 6) {
-      setError('인증번호 6자리를 입력해주세요.');
+      setError(t('phone.codeLength'));
       return;
     }
     setError('');
@@ -97,21 +99,21 @@ export default function PhoneVerifyField({
   if (verified) {
     return (
       <div className='field'>
-        <label htmlFor='phoneNumber'>휴대폰 번호</label>
+        <label htmlFor='phoneNumber'>{t('phone.label')}</label>
         <input
           id='phoneNumber'
           className='text-input'
           value={phoneNumber}
           disabled
         />
-        <span className='verify-status verified'>✓ 인증 완료</span>
+        <span className='verify-status verified'>{t('phone.verified')}</span>
       </div>
     );
   }
 
   return (
     <div className='field'>
-      <label htmlFor='phoneNumber'>휴대폰 번호</label>
+      <label htmlFor='phoneNumber'>{t('phone.label')}</label>
       <div className='verify-row'>
         <input
           id='phoneNumber'
@@ -131,10 +133,10 @@ export default function PhoneVerifyField({
           onClick={handleSendCode}
         >
           {step === 'idle'
-            ? '인증번호 받기'
+            ? t('phone.sendCode')
             : resendLocked
-              ? `재전송 (${resendSecondsLeft}s)`
-              : '재전송'}
+              ? t('phone.resendWait', { sec: resendSecondsLeft })
+              : t('phone.resend')}
         </button>
       </div>
 
@@ -142,7 +144,7 @@ export default function PhoneVerifyField({
         <div className='verify-row' style={{ marginTop: 4 }}>
           <input
             className='text-input'
-            placeholder='인증번호 6자리'
+            placeholder={t('phone.codePlaceholder')}
             inputMode='numeric'
             maxLength={6}
             value={code}
@@ -155,7 +157,7 @@ export default function PhoneVerifyField({
             disabled={verifyLoading}
             onClick={handleVerifyCode}
           >
-            확인
+            {t('common.confirm')}
           </button>
         </div>
       )}
@@ -163,7 +165,7 @@ export default function PhoneVerifyField({
       {error && <span className='field-error'>{error}</span>}
       {step === 'sent' && !error && (
         <span className='field-hint'>
-          문자로 받은 6자리 인증번호를 입력해주세요.
+          {t('phone.hint')}
         </span>
       )}
     </div>

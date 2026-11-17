@@ -1,3 +1,4 @@
+import { useI18n } from '../context/LanguageContext';
 import { useState } from 'react';
 
 const SIZE = 140;
@@ -11,6 +12,7 @@ const GAP = 2; // 조각 사이 간격(px)
  * @param {{key:string,label:string,weight:number,color:string}[]} slices weight 는 0~1 비율
  */
 export default function AllocationDonut({ slices, centerLabel, centerValue }) {
+  const { t } = useI18n();
   const [hover, setHover] = useState(null);
 
   let offset = 0;
@@ -32,7 +34,7 @@ export default function AllocationDonut({ slices, centerLabel, centerValue }) {
       className='alloc-donut'
       viewBox={`0 0 ${SIZE} ${SIZE}`}
       role='img'
-      aria-label='보유 비중 도넛 차트'
+      aria-label={t('inv.donutLabel')}
     >
       <g transform={`rotate(-90 ${SIZE / 2} ${SIZE / 2})`}>
         {arcs.map((a) => (

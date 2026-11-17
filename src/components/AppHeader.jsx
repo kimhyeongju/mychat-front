@@ -2,10 +2,13 @@ import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { logout } from '../api/auth';
 import { useAuth } from '../context/AuthContext';
+import { useI18n } from '../context/LanguageContext';
+import LanguageToggle from './LanguageToggle';
 import ThemeToggle from './ThemeToggle';
 
 export default function AppHeader() {
   const { user, isAuthenticated, markLoggedOut } = useAuth();
+  const { t } = useI18n();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
   const navigate = useNavigate();
@@ -44,6 +47,7 @@ export default function AppHeader() {
       </Link>
 
       <nav className='app-header__nav'>
+        <LanguageToggle floating={false} />
         <ThemeToggle floating={false} />
 
         {isAuthenticated ? (
@@ -70,7 +74,7 @@ export default function AppHeader() {
                       role='menuitem'
                       onClick={() => setMenuOpen(false)}
                     >
-                      사용자 관리
+                      {t('nav.userAdmin')}
                     </Link>
                   )}
                   <Link
@@ -78,7 +82,7 @@ export default function AppHeader() {
                     role='menuitem'
                     onClick={() => setMenuOpen(false)}
                   >
-                    회원정보 수정
+                    {t('nav.profile')}
                   </Link>
                   <Link
                     to='/withdraw'
@@ -86,7 +90,7 @@ export default function AppHeader() {
                     className='user-menu__danger'
                     onClick={() => setMenuOpen(false)}
                   >
-                    회원 탈퇴
+                    {t('nav.withdraw')}
                   </Link>
                 </div>
               )}
@@ -97,16 +101,16 @@ export default function AppHeader() {
               className='btn btn-ghost'
               onClick={handleLogout}
             >
-              로그아웃
+              {t('nav.logout')}
             </button>
           </>
         ) : (
           <>
             <Link to='/login' className='btn btn-ghost'>
-              로그인
+              {t('nav.login')}
             </Link>
             <Link to='/signup' className='btn btn-solid'>
-              회원가입
+              {t('nav.signup')}
             </Link>
           </>
         )}

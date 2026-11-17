@@ -412,3 +412,18 @@ input.text-input::placeholder {
 .theme-toggle:hover {
   border-color: var(--accent);
 }
+
+.lang-toggle {
+  width: auto;
+  min-width: 36px;
+  padding: 0 10px;
+  border-radius: 18px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.lang-toggle--floating {
+  position: absolute;
+  top: 20px;
+  right: 64px;
+}

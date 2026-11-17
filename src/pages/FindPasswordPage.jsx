@@ -4,10 +4,12 @@ import AuthLayout from '../components/AuthLayout'
 import PhoneVerifyField from '../components/PhoneVerifyField'
 import { resetPassword } from '../api/auth'
 import PasswordRules from '../components/PasswordRules'
-import { PASSWORD_HINT, validatePassword } from '../utils/password'
+import { useI18n } from '../context/LanguageContext'
+import { validatePassword } from '../utils/password'
 
 export default function FindPasswordPage() {
   const navigate = useNavigate()
+  const { t } = useI18n()
   const [username, setUsername] = useState('')
   const [phoneNumber, setPhoneNumber] = useState('')
   const [phoneVerified, setPhoneVerified] = useState(false)
@@ -21,14 +23,14 @@ export default function FindPasswordPage() {
     setError('')
 
     if (!phoneVerified) {
-      setError('휴대폰 인증을 먼저 완료해주세요.')
+      setError(t('phone.needVerify'))
       return
     }
     if (newPassword !== newPasswordConfirm) {
-      setError('새 비밀번호가 일치하지 않습니다.')
+      setError(t('findPw.mismatch'))
       return
     }
-    const passwordError = validatePassword(newPassword)
+    const passwordError = validatePassword(newPassword, t)
     if (passwordError) {
       setError(passwordError)
       return
@@ -46,12 +48,12 @@ export default function FindPasswordPage() {
   }
 
   return (
-    <AuthLayout title="비밀번호 찾기" subtitle="아이디와 휴대폰 인증으로 새 비밀번호를 설정해요.">
+    <AuthLayout title={t('findPw.title')} subtitle={t('findPw.subtitle')}>
       <form className="auth-form" onSubmit={handleSubmit}>
         {error && <div className="banner banner-error">{error}</div>}
 
         <div className="field">
-          <label htmlFor="username">아이디</label>
+          <label htmlFor="username">{t('findPw.username')}</label>
           <input
             id="username"
             className="text-input"
@@ -71,12 +73,12 @@ export default function FindPasswordPage() {
         {phoneVerified && (
           <>
             <div className="field">
-              <label htmlFor="newPassword">새 비밀번호</label>
+              <label htmlFor="newPassword">{t('findPw.newPassword')}</label>
               <input
                 id="newPassword"
                 type="password"
                 className="text-input"
-                placeholder={PASSWORD_HINT}
+                placeholder={t('pw.hint')}
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 required
@@ -84,7 +86,7 @@ export default function FindPasswordPage() {
               <PasswordRules password={newPassword} />
             </div>
             <div className="field">
-              <label htmlFor="newPasswordConfirm">새 비밀번호 확인</label>
+              <label htmlFor="newPasswordConfirm">{t('findPw.newPasswordConfirm')}</label>
               <input
                 id="newPasswordConfirm"
                 type="password"
@@ -98,12 +100,12 @@ export default function FindPasswordPage() {
         )}
 
         <button type="submit" className="btn btn-primary btn-block" disabled={loading}>
-          {loading ? '변경하는 중...' : '비밀번호 변경'}
+          {loading ? t('findPw.submitting') : t('findPw.submit')}
         </button>
       </form>
 
       <div className="auth-footer">
-        <Link to="/login" className="link">로그인으로 돌아가기</Link>
+        <Link to="/login" className="link">{t('common.backToLogin')}</Link>
       </div>
     </AuthLayout>
   )

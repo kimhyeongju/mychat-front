@@ -4,6 +4,7 @@ import { startDirect } from '../api/chat';
 import { getUserPortfolio } from '../api/invest';
 import AllocationDonut from '../components/AllocationDonut';
 import { useAuth } from '../context/AuthContext';
+import { useI18n } from '../context/LanguageContext';
 import usePolling from '../hooks/usePolling';
 import { formatRate, signClass } from '../utils/money';
 
@@ -14,6 +15,7 @@ const pct = (w) => `${(Number(w) * 100).toFixed(1)}%`;
 export default function UserPortfolioPage() {
   const { userId } = useParams();
   const { user } = useAuth();
+  const { t } = useI18n();
   const navigate = useNavigate();
 
   const [data, setData] = useState(null);
@@ -51,19 +53,19 @@ export default function UserPortfolioPage() {
     if (restWeight > 0) {
       list.push({
         key: '__other',
-        label: '기타 종목',
+        label: t('inv.otherStocks'),
         weight: restWeight,
         color: 'var(--alloc-other)',
       });
     }
     list.push({
       key: '__cash',
-      label: '현금',
+      label: t('up.cash'),
       weight: Number(data.cashWeight),
       color: 'var(--alloc-cash)',
     });
     return list;
-  }, [data]);
+  }, [data, t]);
 
   const colorOf = (index) =>
     index < MAX_SLICES ? `var(--alloc-${index + 1})` : 'var(--alloc-other)';
@@ -78,71 +80,77 @@ export default function UserPortfolioPage() {
   };
 
   const isMe = userId === user?.id;
+  const displayName =
+    data?.nickname === '(탈퇴한 사용자)'
+      ? t('inv.withdrawnUser')
+      : data?.nickname;
 
   return (
     <main className='page page--wide invest'>
       <div className='page__header'>
         <div className='invest__title-row'>
           <Link to='/invest' className='btn btn-ghost btn-sm'>
-            ← 투자 홈
+            {t('inv.backHome')}
           </Link>
           <h1 className='page__title'>
-            {data ? `${data.nickname}님의 포트폴리오` : '포트폴리오'}
+            {data
+              ? t('up.title', { name: displayName })
+              : t('up.titleDefault')}
           </h1>
         </div>
         {data && !isMe && (
           <button type='button' className='btn btn-sm' onClick={sendDm}>
-            DM 보내기
+            {t('inv.menuDm')}
           </button>
         )}
       </div>
 
       {error && <p className='form-msg form-msg--error'>{error}</p>}
-      {!data && !error && <p className='muted'>불러오는 중...</p>}
+      {!data && !error && <p className='muted'>{t('inv.loading')}</p>}
 
       {data && (
         <>
           <section className='invest-card'>
             <dl className='invest-stats'>
               <div>
-                <dt>순위</dt>
-                <dd>{data.rank != null ? `${data.rank}위` : '-'}</dd>
+                <dt>{t('up.rank')}</dt>
+                <dd>{data.rank != null ? t('inv.rankN', { n: data.rank }) : '-'}</dd>
               </div>
               <div>
-                <dt>수익률</dt>
+                <dt>{t('inv.returnRate')}</dt>
                 <dd className={signClass(data.returnRate)}>
                   {formatRate(data.returnRate)}
                 </dd>
               </div>
               <div>
-                <dt>보유 종목</dt>
-                <dd>{data.positions.length}개</dd>
+                <dt>{t('up.positionsCount')}</dt>
+                <dd>{t('inv.countN', { n: data.positions.length })}</dd>
               </div>
             </dl>
             <p className='muted invest-note'>
-              다른 사용자의 포트폴리오는 종목별 비중과 수익률만 공개됩니다.
+              {t('up.privacy')}
               {data.pricesStale &&
-                ' 일부 종목의 시세가 최신이 아니어서 비중이 다를 수 있습니다.'}
+                t('inv.staleWeightNote')}
             </p>
           </section>
 
           <section className='invest-card'>
-            <h2 className='invest-card__title'>자산 비중</h2>
+            <h2 className='invest-card__title'>{t('up.allocation')}</h2>
             <div className='alloc'>
               <AllocationDonut
                 slices={slices}
-                centerLabel='현금'
+                centerLabel={t('up.cash')}
                 centerValue={pct(data.cashWeight)}
               />
               {data.positions.length === 0 ? (
-                <p className='muted empty'>보유 종목이 없습니다.</p>
+                <p className='muted empty'>{t('pf.noPositions')}</p>
               ) : (
                 <table className='invest-table alloc__table'>
                   <thead>
                     <tr>
-                      <th>종목</th>
-                      <th className='num'>비중</th>
-                      <th className='num'>수익률</th>
+                      <th>{t('pf.colSymbol')}</th>
+                      <th className='num'>{t('up.weight')}</th>
+                      <th className='num'>{t('inv.returnRate')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -177,7 +185,7 @@ export default function UserPortfolioPage() {
                           style={{ background: 'var(--alloc-cash)' }}
                           aria-hidden='true'
                         />
-                        현금
+                        {t('up.cash')}
                       </td>
                       <td className='num'>{pct(data.cashWeight)}</td>
                       <td className='num'>-</td>
