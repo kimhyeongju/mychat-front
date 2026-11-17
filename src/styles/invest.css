@@ -730,3 +730,184 @@
   margin: 12px 0 0;
   font-size: 0.85rem;
 }
+
+/* ---------- 종목 토론 / 뉴스 ---------- */
+.stock-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.stock-tabs__btn {
+  padding: 8px 14px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: none;
+  color: var(--text-muted);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.stock-tabs__btn.is-active {
+  border-bottom-color: var(--accent);
+  color: var(--text);
+}
+
+.discussion__form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.discussion__form-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.discussion__sort {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.discussion__sort-btn {
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: none;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.discussion__sort-btn.is-active {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.post-list,
+.comments__list,
+.news-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.post {
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.post__head,
+.comment__head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.post__time {
+  font-size: 0.8rem;
+}
+
+.post__content {
+  margin: 0 0 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.post__textarea {
+  width: 100%;
+  resize: vertical;
+  font: inherit;
+}
+
+.post__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+
+.post__action {
+  padding: 4px 8px;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.post__action:hover {
+  background: var(--border);
+}
+
+.post__action.is-on {
+  color: #e5484d;
+}
+
+.post__action--danger:hover {
+  color: #e5484d;
+}
+
+.comments {
+  margin-top: 8px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--bg, transparent);
+  border: 1px solid var(--border);
+}
+
+.comment {
+  padding: 6px 0;
+}
+
+.comment .post__content {
+  margin-bottom: 0;
+}
+
+.comments__form {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.comments__form .text-input {
+  flex: 1;
+}
+
+.news-item {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.news-item__title {
+  display: block;
+  font-weight: 600;
+  color: var(--text);
+  text-decoration: none;
+}
+
+a.news-item__title:hover {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+.news-item__meta {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.8rem;
+}
+
+.news-item__summary {
+  margin: 6px 0 0;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}

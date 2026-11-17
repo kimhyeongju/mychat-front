@@ -94,3 +94,72 @@ export function removeWatch(symbol) {
 export function getSplitAdjustments() {
   return apiRequest('/api/invest/split-adjustments', { auth: true });
 }
+
+// ---------- 종목 뉴스 / 토론 ----------
+
+/** 비로그인도 호출 가능. 최신순 최대 15건. */
+export function getStockNews(symbol) {
+  return apiRequest(`/api/invest/symbols/${encodeURIComponent(symbol)}/news`);
+}
+
+/**
+ * 토론 글 목록. 비로그인도 호출 가능하고, 토큰이 있으면 liked/mine 이 채워진다.
+ * @param {'latest'|'popular'} sort
+ */
+export function getStockPosts(symbol, { sort = 'latest', page = 0, size = 20 } = {}) {
+  const params = new URLSearchParams({ sort, page, size });
+  return apiRequest(
+    `/api/invest/symbols/${encodeURIComponent(symbol)}/posts?${params}`,
+    { auth: true },
+  );
+}
+
+export function createStockPost(symbol, content) {
+  return apiRequest(`/api/invest/symbols/${encodeURIComponent(symbol)}/posts`, {
+    method: 'POST',
+    body: { content },
+    auth: true,
+  });
+}
+
+export function updateStockPost(postId, content) {
+  return apiRequest(`/api/invest/posts/${postId}`, {
+    method: 'PATCH',
+    body: { content },
+    auth: true,
+  });
+}
+
+export function deleteStockPost(postId) {
+  return apiRequest(`/api/invest/posts/${postId}`, {
+    method: 'DELETE',
+    auth: true,
+  });
+}
+
+/** @returns {Promise<{likeCount: number, liked: boolean}>} */
+export function setPostLike(postId, liked) {
+  return apiRequest(`/api/invest/posts/${postId}/like`, {
+    method: liked ? 'PUT' : 'DELETE',
+    auth: true,
+  });
+}
+
+export function getPostComments(postId) {
+  return apiRequest(`/api/invest/posts/${postId}/comments`, { auth: true });
+}
+
+export function createPostComment(postId, content) {
+  return apiRequest(`/api/invest/posts/${postId}/comments`, {
+    method: 'POST',
+    body: { content },
+    auth: true,
+  });
+}
+
+export function deletePostComment(commentId) {
+  return apiRequest(`/api/invest/comments/${commentId}`, {
+    method: 'DELETE',
+    auth: true,
+  });
+}

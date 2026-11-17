@@ -3,6 +3,8 @@ import { Link, useParams } from 'react-router-dom';
 import { getPortfolio, getQuote, placeTrade } from '../api/invest';
 import CurrencyToggle from '../components/CurrencyToggle';
 import StarButton from '../components/StarButton';
+import StockDiscussion from '../components/StockDiscussion';
+import StockNews from '../components/StockNews';
 import StockSearch from '../components/StockSearch';
 import { useAuth } from '../context/AuthContext';
 import { useI18n } from '../context/LanguageContext';
@@ -26,6 +28,7 @@ export default function StockPage() {
   const [side, setSide] = useState('BUY');
   const [quantity, setQuantity] = useState('1');
   const [submitting, setSubmitting] = useState(false);
+  const [tab, setTab] = useState('discussion'); // discussion | news
   const [message, setMessage] = useState(null); // { type: 'ok'|'error', text }
 
   // ----- 시세: 15초마다 갱신 -----
@@ -315,6 +318,30 @@ export default function StockPage() {
                 </p>
               )}
             </form>
+          )}
+        </section>
+      )}
+
+      {quote && (
+        <section className='invest-card'>
+          <div className='stock-tabs' role='tablist'>
+            {['discussion', 'news'].map((key) => (
+              <button
+                key={key}
+                type='button'
+                role='tab'
+                aria-selected={tab === key}
+                className={`stock-tabs__btn ${tab === key ? 'is-active' : ''}`}
+                onClick={() => setTab(key)}
+              >
+                {tr(`tab.${key}`)}
+              </button>
+            ))}
+          </div>
+          {tab === 'discussion' ? (
+            <StockDiscussion symbol={symbol} />
+          ) : (
+            <StockNews symbol={symbol} />
           )}
         </section>
       )}
