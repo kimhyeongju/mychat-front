@@ -2,6 +2,16 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? '';
 
 const ACCESS_TOKEN_KEY = 'playground_access_token';
 const REFRESH_TOKEN_KEY = 'playground_refresh_token';
+const LANGUAGE_KEY = 'playground_lang';
+
+/** 서버가 오류 문구를 이 언어로 내려준다(ko, en). 기본은 한국어. */
+export function getLanguage() {
+  return localStorage.getItem(LANGUAGE_KEY) === 'en' ? 'en' : 'ko';
+}
+
+export function setLanguage(lang) {
+  localStorage.setItem(LANGUAGE_KEY, lang === 'en' ? 'en' : 'ko');
+}
 
 export function getAccessToken() {
   return localStorage.getItem(ACCESS_TOKEN_KEY);
@@ -21,11 +31,58 @@ export function clearTokens() {
   localStorage.removeItem(REFRESH_TOKEN_KEY);
 }
 
+/**
+ * @param {string} message - 사용자에게 보여줄 문구
+ * @param {number} status - HTTP 상태. 서버에 닿지 못했으면 0
+ * @param {string} [code] - 서버의 오류 코드(exception_*.yml 의 code)
+ * @param {{field: string, message: string}[]} [fieldErrors] - 입력 검증 실패 사유
+ */
 export class ApiError extends Error {
-  constructor(message, status) {
+  constructor(message, status, code, fieldErrors = []) {
     super(message);
     this.status = status;
+    this.code = code;
+    this.fieldErrors = fieldErrors;
   }
+}
+
+const NETWORK_ERROR = {
+  ko: '서버에 연결할 수 없습니다. 네트워크를 확인하고 잠시 후 다시 시도해주세요.',
+  en: 'Cannot connect to the server. Check your network and try again.',
+};
+
+// 서버가 본문을 주지 못한 경우(프록시 오류 등)에 쓰는 상태별 기본 문구.
+const STATUS_FALLBACK = {
+  ko: {
+    401: '로그인이 필요하거나 로그인이 만료되었습니다. 다시 로그인해주세요.',
+    403: '권한이 없습니다.',
+    404: '요청한 대상을 찾을 수 없습니다.',
+    413: '파일 크기가 너무 큽니다.',
+    429: '요청이 너무 많습니다. 잠시 후 다시 시도해주세요.',
+    default: '요청을 처리하지 못했습니다. 잠시 후 다시 시도해주세요.',
+    server: '서버에 문제가 생겼습니다. 잠시 후 다시 시도해주세요.',
+  },
+  en: {
+    401: 'Login is required, or your session has expired. Please log in again.',
+    403: 'You do not have permission.',
+    404: 'The requested resource was not found.',
+    413: 'The file is too large.',
+    429: 'Too many requests. Please try again later.',
+    default: 'The request could not be processed. Please try again later.',
+    server: 'Something went wrong on the server. Please try again later.',
+  },
+};
+
+function fallbackMessage(status) {
+  const table = STATUS_FALLBACK[getLanguage()];
+  if (table[status]) return table[status];
+  return status >= 500 ? table.server : table.default;
+}
+
+/** 로그인이 풀렸음을 앱에 알린다. AuthContext 가 듣고 로그아웃 상태로 바꾼다. */
+function notifyAuthExpired() {
+  clearTokens();
+  window.dispatchEvent(new Event('auth:expired'));
 }
 
 /**
@@ -43,7 +100,10 @@ async function refreshAccessToken() {
     try {
       const response = await fetch(`${API_BASE_URL}/api/auth/reissue`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept-Language': getLanguage(),
+        },
         body: JSON.stringify({ refreshToken }),
       });
 
@@ -69,7 +129,7 @@ function buildRequest(
   path,
   { method, body, auth, isFormData, extraHeaders },
 ) {
-  const headers = { ...extraHeaders };
+  const headers = { 'Accept-Language': getLanguage(), ...extraHeaders };
 
   // FormData는 브라우저가 boundary를 포함한 Content-Type을 직접 정해야 하므로
   // 여기서 지정하면 업로드가 깨진다.
@@ -94,14 +154,28 @@ function buildRequest(
 }
 
 async function parseError(response) {
-  let message = `요청에 실패했습니다. (${response.status})`;
+  let message = fallbackMessage(response.status);
+  let code;
+  let fieldErrors = [];
   try {
+    // 서버 오류 본문: { code, message, status, fieldErrors }
     const data = await response.json();
-    message = data.message || data.error || message;
+    message = data.message || message;
+    code = data.code;
+    fieldErrors = Array.isArray(data.fieldErrors) ? data.fieldErrors : [];
   } catch {
-    // 응답이 JSON이 아닌 경우 기본 메시지 사용
+    // 응답이 JSON이 아닌 경우 상태별 기본 문구를 쓴다.
   }
-  return new ApiError(message, response.status);
+  return new ApiError(message, response.status, code, fieldErrors);
+}
+
+/** fetch 자체가 실패하면(서버 다운, 네트워크 끊김) 상태가 없으므로 별도 오류로 바꾼다. */
+async function safeFetch(url, init) {
+  try {
+    return await fetch(url, init);
+  } catch {
+    throw new ApiError(NETWORK_ERROR[getLanguage()], 0);
+  }
 }
 
 /**
@@ -119,7 +193,7 @@ export async function apiRequest(
   const isFormData = body instanceof FormData;
   const url = `${API_BASE_URL}${path}`;
 
-  let response = await fetch(
+  let response = await safeFetch(
     url,
     buildRequest(path, { method, body, auth, isFormData, extraHeaders }),
   );
@@ -128,11 +202,17 @@ export async function apiRequest(
   if (response.status === 401 && auth && getRefreshToken()) {
     const refreshed = await refreshAccessToken();
     if (refreshed) {
-      response = await fetch(
+      response = await safeFetch(
         url,
         buildRequest(path, { method, body, auth, isFormData, extraHeaders }),
       );
     }
+  }
+
+  // 로그인이 필요한 요청인데 재발급까지 실패했다면 로그인이 풀린 것이다.
+  // 로그인 화면의 잘못된 비밀번호(auth: false)와는 구분된다.
+  if (response.status === 401 && auth) {
+    notifyAuthExpired();
   }
 
   if (!response.ok) {
@@ -153,10 +233,13 @@ export async function apiRequest(
  * 파일 다운로드용. JSON이 아니라 Blob을 받는다.
  */
 export async function apiDownload(path) {
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    headers: getAccessToken()
-      ? { Authorization: `Bearer ${getAccessToken()}` }
-      : {},
+  const response = await safeFetch(`${API_BASE_URL}${path}`, {
+    headers: {
+      'Accept-Language': getLanguage(),
+      ...(getAccessToken()
+        ? { Authorization: `Bearer ${getAccessToken()}` }
+        : {}),
+    },
   });
 
   if (!response.ok) {

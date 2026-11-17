@@ -42,6 +42,13 @@ export function AuthProvider({ children }) {
     return () => window.removeEventListener('storage', onStorage);
   }, [fetchUser]);
 
+  useEffect(() => {
+    // 요청 중 로그인이 풀린 것을 확인하면(client.js) 로그아웃 상태로 맞춘다.
+    const onExpired = () => setUser(null);
+    window.addEventListener('auth:expired', onExpired);
+    return () => window.removeEventListener('auth:expired', onExpired);
+  }, []);
+
   const value = {
     user,
     loading,
