@@ -166,7 +166,7 @@ export function deletePostComment(commentId) {
 
 // ---------- 자동 매수 (로그인) ----------
 
-/** 내 자동 매수 현황: { rules, totalPercent, remainingPercent, history } */
+/** 내 자동 매수 현황: { rules, aiRules, totalPercent, remainingPercent, aiEnabled, history } */
 export function getAutoBuys() {
   return apiRequest('/api/invest/auto-buys', { auth: true });
 }
@@ -176,6 +176,28 @@ export function createAutoBuy({ symbol, percent }) {
   return apiRequest('/api/invest/auto-buys', {
     method: 'POST',
     body: { symbol, percent },
+    auth: true,
+  });
+}
+
+/**
+ * AI 추천 자동 매수 규칙. 응답은 getAutoBuys 와 같은 현황이다.
+ * @param {string} category AI 카테고리 코드(예: SEMICONDUCTOR, CUSTOM, WEEK_SURGE)
+ * @param {string} [topic] category 가 CUSTOM 일 때의 주제
+ * @param {number} stockCount 추천받을 종목 수 1~5
+ * @param {number} percent 총 자산 대비 전체 비율(%)
+ */
+export function createAiAutoBuy({ category, topic, stockCount, percent }) {
+  return apiRequest('/api/invest/auto-buys/ai', {
+    method: 'POST',
+    body: { category, topic, stockCount, percent },
+    auth: true,
+  });
+}
+
+export function deleteAiAutoBuy(id) {
+  return apiRequest(`/api/invest/auto-buys/ai/${id}`, {
+    method: 'DELETE',
     auth: true,
   });
 }

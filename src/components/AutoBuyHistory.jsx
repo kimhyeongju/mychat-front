@@ -23,26 +23,46 @@ export default function AutoBuyHistory({ history }) {
         <ul className='auto-buy__runs'>
           {history.map((run) => {
             const executed = run.status === 'EXECUTED';
+            const isAi = run.source === 'AI';
+            const categoryName = isAi
+              ? run.category === 'CUSTOM'
+                ? run.topic
+                : t(`aic.${run.category}`)
+              : null;
             return (
               <li
-                key={`${run.autoBuyId}-${run.weekEndDate}`}
+                key={`${run.source}-${run.autoBuyId}-${run.weekEndDate}-${run.symbol ?? ''}`}
                 className={executed ? '' : 'muted'}
               >
                 <span className='auto-buy__date'>{dateText(run.runDate)}</span>{' '}
-                <Link
-                  to={`/invest/stocks/${encodeURIComponent(run.symbol)}`}
-                  className='invest-table__symbol'
-                >
-                  {run.symbol}
-                </Link>{' '}
-                {executed
-                  ? t('ab.runExecuted', {
-                      n: run.quantity,
-                      price: money(run.price),
-                    })
-                  : t('ab.runSkipped', {
-                      reason: t(`ab.reason.${run.reason}`),
-                    })}
+                {isAi && (
+                  <span className='ai-badge' title={categoryName}>
+                    AI
+                  </span>
+                )}{' '}
+                {run.symbol ? (
+                  <>
+                    <Link
+                      to={`/invest/stocks/${encodeURIComponent(run.symbol)}`}
+                      className='invest-table__symbol'
+                    >
+                      {run.symbol}
+                    </Link>{' '}
+                    {executed
+                      ? t('ab.runExecuted', {
+                          n: run.quantity,
+                          price: money(run.price),
+                        })
+                      : t('ab.runSkipped', {
+                          reason: t(`ab.reason.${run.reason}`),
+                        })}
+                  </>
+                ) : (
+                  t('ai.runSkipped', {
+                    category: categoryName,
+                    reason: t(`ab.reason.${run.reason}`),
+                  })
+                )}
               </li>
             );
           })}

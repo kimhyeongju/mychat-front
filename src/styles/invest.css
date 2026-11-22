@@ -1019,3 +1019,74 @@ a.news-item__title:hover {
   border-top: none;
   padding-top: 0;
 }
+
+/* ---------- AI 추천 자동 매수 ---------- */
+.ai-form {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.ai-form .field-label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.ai-group {
+  margin-bottom: 8px;
+}
+
+.ai-group__title {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 0.78rem;
+}
+
+.ai-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.ai-chip {
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.ai-chip:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+
+.ai-chip--on {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.ai-chip:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.ai-badge {
+  display: inline-block;
+  padding: 0 6px;
+  border-radius: 6px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.5;
+  vertical-align: 1px;
+}

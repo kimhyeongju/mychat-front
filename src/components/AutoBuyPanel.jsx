@@ -17,7 +17,7 @@ const QUICK_PERCENTS = [10, 25, 50];
 export default function AutoBuyPanel({ symbol }) {
   const { t } = useI18n();
   const { isAuthenticated, loading: authLoading } = useAuth();
-  const { overview, setOverview, error, setError, remove } = useAutoBuys(
+  const { overview, setOverview, error, setError, remove, removeAi } = useAutoBuys(
     !authLoading && isAuthenticated,
   );
 
@@ -134,7 +134,18 @@ export default function AutoBuyPanel({ symbol }) {
               </p>
             )}
 
-            <AutoBuyList rules={overview.rules} onDelete={remove} />
+            <p className='muted invest-note'>
+              <Link to='/invest/portfolio' className='link'>
+                {t('ab.aiLink')}
+              </Link>
+            </p>
+
+            <AutoBuyList
+              rules={overview.rules}
+              aiRules={overview.aiRules}
+              onDelete={remove}
+              onDeleteAi={removeAi}
+            />
             <AutoBuyHistory history={overview.history} />
           </>
         )

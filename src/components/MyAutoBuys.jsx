@@ -1,4 +1,5 @@
 import { useI18n } from '../context/LanguageContext';
+import AiAutoBuyForm from './AiAutoBuyForm';
 import AutoBuyHistory from './AutoBuyHistory';
 import AutoBuyList from './AutoBuyList';
 import AutoBuySummary from './AutoBuySummary';
@@ -7,7 +8,7 @@ import useAutoBuys from './useAutoBuys';
 /** 내 자동 매수 전체 현황(포트폴리오 화면): 비율 배정, 규칙, 실행 내역. */
 export default function MyAutoBuys() {
   const { t } = useI18n();
-  const { overview, error, remove } = useAutoBuys(true);
+  const { overview, setOverview, error, remove, removeAi } = useAutoBuys(true);
 
   return (
     <section className='invest-card'>
@@ -19,7 +20,15 @@ export default function MyAutoBuys() {
             totalPercent={overview.totalPercent}
             remainingPercent={overview.remainingPercent}
           />
-          <AutoBuyList rules={overview.rules} onDelete={remove} />
+          {overview.remainingPercent > 0 && (
+            <AiAutoBuyForm overview={overview} onCreated={setOverview} />
+          )}
+          <AutoBuyList
+            rules={overview.rules}
+            aiRules={overview.aiRules}
+            onDelete={remove}
+            onDeleteAi={removeAi}
+          />
           <AutoBuyHistory history={overview.history} />
         </>
       )}

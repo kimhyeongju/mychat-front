@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { deleteAutoBuy, getAutoBuys } from '../api/invest';
+import { deleteAiAutoBuy, deleteAutoBuy, getAutoBuys } from '../api/invest';
 import { useI18n } from '../context/LanguageContext';
 
 /**
@@ -44,5 +44,19 @@ export default function useAutoBuys(enabled = true) {
     [t],
   );
 
-  return { overview, setOverview, error, setError, remove };
+  const removeAi = useCallback(
+    async (rule) => {
+      if (!window.confirm(t('ab.confirmDelete'))) return;
+      try {
+        await deleteAiAutoBuy(rule.id);
+        setOverview(await getAutoBuys());
+        setError('');
+      } catch (err) {
+        setError(err.message);
+      }
+    },
+    [t],
+  );
+
+  return { overview, setOverview, error, setError, remove, removeAi };
 }
