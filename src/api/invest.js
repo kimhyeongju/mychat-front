@@ -166,15 +166,16 @@ export function deletePostComment(commentId) {
 
 // ---------- 자동 매수 (로그인) ----------
 
+/** 내 자동 매수 현황: { rules, totalPercent, remainingPercent, history } */
 export function getAutoBuys() {
   return apiRequest('/api/invest/auto-buys', { auth: true });
 }
 
-/** @param {number} dayOfWeek 1(월) ~ 5(금) */
-export function createAutoBuy({ symbol, dayOfWeek, percent }) {
+/** 항상 월요일에 실행된다. 응답은 getAutoBuys 와 같은 현황이다. */
+export function createAutoBuy({ symbol, percent }) {
   return apiRequest('/api/invest/auto-buys', {
     method: 'POST',
-    body: { symbol, dayOfWeek, percent },
+    body: { symbol, percent },
     auth: true,
   });
 }

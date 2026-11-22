@@ -1,54 +1,51 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { createAutoBuy, deleteAutoBuy, getAutoBuys } from '../api/invest';
+import { createAutoBuy } from '../api/invest';
 import { useAuth } from '../context/AuthContext';
 import { useI18n } from '../context/LanguageContext';
-import AutoBuyList, { dayName } from './AutoBuyList';
+import AutoBuyHistory from './AutoBuyHistory';
+import AutoBuyList from './AutoBuyList';
+import AutoBuySummary from './AutoBuySummary';
+import useAutoBuys from './useAutoBuys';
 
-const DAYS = [1, 2, 3, 4, 5];
 const QUICK_PERCENTS = [10, 25, 50];
 
-/** 종목 화면의 자동 매수 설정: 요일과 총 자산 대비 비율을 정해 규칙을 만든다. */
+/**
+ * 종목 화면의 자동 매수 설정. 매주 월요일 장 시작 직후 총 자산의 N% 를 산다.
+ * 내 모든 규칙의 비율 합계는 100% 를 넘을 수 없어서, 남은 비율을 보여주고 그 안에서만 받는다.
+ */
 export default function AutoBuyPanel({ symbol }) {
-  const { t, locale } = useI18n();
+  const { t } = useI18n();
   const { isAuthenticated, loading: authLoading } = useAuth();
+  const { overview, setOverview, error, setError, remove } = useAutoBuys(
+    !authLoading && isAuthenticated,
+  );
 
-  const [rules, setRules] = useState([]);
-  const [dayOfWeek, setDayOfWeek] = useState(1);
   const [percent, setPercent] = useState('30');
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState(null); // { type, text }
 
-  useEffect(() => {
-    if (authLoading || !isAuthenticated) {
-      setRules([]);
-      return undefined;
-    }
-    let cancelled = false;
-    getAutoBuys()
-      .then((list) => {
-        if (!cancelled) setRules(list);
-      })
-      .catch(() => {});
-    return () => {
-      cancelled = true;
-    };
-  }, [authLoading, isAuthenticated]);
-
+  const remaining = overview ? overview.remainingPercent : 0;
   const pct = Number.parseInt(percent, 10);
-  const validPercent = Number.isInteger(pct) && pct >= 1 && pct <= 100;
+  const validPercent = Number.isInteger(pct) && pct >= 1 && pct <= remaining;
 
   const submit = async (e) => {
     e.preventDefault();
     if (!validPercent) {
-      setMessage({ type: 'error', text: t('ab.percentInvalid') });
+      setMessage({
+        type: 'error',
+        text:
+          Number.isInteger(pct) && pct > remaining
+            ? t('ab.percentExceeded', { n: remaining })
+            : t('ab.percentInvalid', { max: remaining }),
+      });
       return;
     }
     setSubmitting(true);
     setMessage(null);
+    setError('');
     try {
-      const created = await createAutoBuy({ symbol, dayOfWeek, percent: pct });
-      setRules((prev) => [created, ...prev]);
+      setOverview(await createAutoBuy({ symbol, percent: pct }));
       setMessage({ type: 'ok', text: t('ab.added') });
     } catch (err) {
       setMessage({ type: 'error', text: err.message });
@@ -56,21 +53,6 @@ export default function AutoBuyPanel({ symbol }) {
       setSubmitting(false);
     }
   };
-
-  const remove = useCallback(
-    async (rule) => {
-      if (!window.confirm(t('ab.confirmDelete'))) return;
-      try {
-        await deleteAutoBuy(rule.id);
-        setRules((prev) => prev.filter((r) => r.id !== rule.id));
-      } catch (err) {
-        setMessage({ type: 'error', text: err.message });
-      }
-    },
-    [t],
-  );
-
-  const mine = rules.filter((r) => r.symbol === symbol);
 
   return (
     <section className='invest-card'>
@@ -86,73 +68,76 @@ export default function AutoBuyPanel({ symbol }) {
           {t('ab.loginToUse2')}
         </p>
       ) : (
-        <>
-          <form className='auto-buy-form' onSubmit={submit}>
-            <div className='field'>
-              <label htmlFor='ab-day'>{t('ab.day')}</label>
-              <select
-                id='ab-day'
-                className='text-input'
-                value={dayOfWeek}
-                onChange={(e) => setDayOfWeek(Number(e.target.value))}
-              >
-                {DAYS.map((d) => (
-                  <option key={d} value={d}>
-                    {dayName(d, locale)}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className='field'>
-              <label htmlFor='ab-percent'>{t('ab.percent')}</label>
-              <div className='trade-form__qty'>
-                <input
-                  id='ab-percent'
-                  type='number'
-                  className='text-input'
-                  min='1'
-                  max='100'
-                  step='1'
-                  inputMode='numeric'
-                  value={percent}
-                  onChange={(e) => setPercent(e.target.value)}
-                  required
-                />
-                {QUICK_PERCENTS.map((p) => (
-                  <button
-                    key={p}
-                    type='button'
-                    className='btn btn-ghost btn-sm'
-                    onClick={() => setPercent(String(p))}
-                  >
-                    {p}%
-                  </button>
-                ))}
-              </div>
-            </div>
-            <p className='muted invest-note'>{t('ab.timeNote')}</p>
-            {message && (
+        overview && (
+          <>
+            <AutoBuySummary
+              totalPercent={overview.totalPercent}
+              remainingPercent={overview.remainingPercent}
+            />
+
+            {remaining > 0 && (
+              <form className='auto-buy-form' onSubmit={submit}>
+                <div className='field'>
+                  <label htmlFor='ab-percent'>{t('ab.percent')}</label>
+                  <div className='trade-form__qty'>
+                    <input
+                      id='ab-percent'
+                      type='number'
+                      className='text-input'
+                      min='1'
+                      max={remaining}
+                      step='1'
+                      inputMode='numeric'
+                      value={percent}
+                      onChange={(e) => setPercent(e.target.value)}
+                      required
+                    />
+                    {QUICK_PERCENTS.filter((p) => p < remaining).map((p) => (
+                      <button
+                        key={p}
+                        type='button'
+                        className='btn btn-ghost btn-sm'
+                        onClick={() => setPercent(String(p))}
+                      >
+                        {p}%
+                      </button>
+                    ))}
+                    <button
+                      type='button'
+                      className='btn btn-ghost btn-sm'
+                      onClick={() => setPercent(String(remaining))}
+                    >
+                      {t('ab.max')} {remaining}%
+                    </button>
+                  </div>
+                </div>
+                <p className='muted invest-note'>{t('ab.timeNote')}</p>
+                <button
+                  type='submit'
+                  className='btn btn-solid'
+                  disabled={submitting || !validPercent}
+                >
+                  {submitting ? t('ab.adding') : t('ab.add')}
+                </button>
+              </form>
+            )}
+
+            {(message || error) && (
               <p
                 className={`form-msg ${
-                  message.type === 'ok' ? 'form-msg--ok' : 'form-msg--error'
+                  message?.type === 'ok' && !error
+                    ? 'form-msg--ok'
+                    : 'form-msg--error'
                 }`}
               >
-                {message.text}
+                {error || message.text}
               </p>
             )}
-            <button
-              type='submit'
-              className='btn btn-solid'
-              disabled={submitting || !validPercent}
-            >
-              {submitting ? t('ab.adding') : t('ab.add')}
-            </button>
-          </form>
 
-          {mine.length > 0 && (
-            <AutoBuyList rules={mine} onDelete={remove} showSymbol={false} />
-          )}
-        </>
+            <AutoBuyList rules={overview.rules} onDelete={remove} />
+            <AutoBuyHistory history={overview.history} />
+          </>
+        )
       )}
     </section>
   );
