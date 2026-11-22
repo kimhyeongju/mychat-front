@@ -163,3 +163,25 @@ export function deletePostComment(commentId) {
     auth: true,
   });
 }
+
+// ---------- 자동 매수 (로그인) ----------
+
+export function getAutoBuys() {
+  return apiRequest('/api/invest/auto-buys', { auth: true });
+}
+
+/** @param {number} dayOfWeek 1(월) ~ 5(금) */
+export function createAutoBuy({ symbol, dayOfWeek, percent }) {
+  return apiRequest('/api/invest/auto-buys', {
+    method: 'POST',
+    body: { symbol, dayOfWeek, percent },
+    auth: true,
+  });
+}
+
+export function deleteAutoBuy(id) {
+  return apiRequest(`/api/invest/auto-buys/${id}`, {
+    method: 'DELETE',
+    auth: true,
+  });
+}

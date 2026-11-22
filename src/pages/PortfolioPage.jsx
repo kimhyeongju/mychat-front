@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getPortfolio, getSplitAdjustments, getTrades } from '../api/invest';
 import CurrencyToggle from '../components/CurrencyToggle';
+import MyAutoBuys from '../components/MyAutoBuys';
 import { useCurrency } from '../context/CurrencyContext';
 import { useI18n } from '../context/LanguageContext';
 import usePolling from '../hooks/usePolling';
@@ -210,6 +211,8 @@ export default function PortfolioPage() {
           </p>
         </section>
       )}
+
+      <MyAutoBuys />
 
       <section className='invest-card'>
         <h2 className='invest-card__title'>{tr('pf.trades')}</h2>

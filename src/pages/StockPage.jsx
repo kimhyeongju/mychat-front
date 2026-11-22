@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { getPortfolio, getQuote, placeTrade } from '../api/invest';
 import CurrencyToggle from '../components/CurrencyToggle';
+import AutoBuyPanel from '../components/AutoBuyPanel';
 import StarButton from '../components/StarButton';
 import StockDiscussion from '../components/StockDiscussion';
 import StockNews from '../components/StockNews';
@@ -321,6 +322,8 @@ export default function StockPage() {
           )}
         </section>
       )}
+
+      {quote && <AutoBuyPanel symbol={symbol} />}
 
       {quote && (
         <section className='invest-card'>

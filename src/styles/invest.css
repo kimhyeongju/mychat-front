@@ -911,3 +911,42 @@ a.news-item__title:hover {
   color: var(--text-muted);
   font-size: 0.9rem;
 }
+
+/* ---------- 자동 매수 ---------- */
+.auto-buy-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 420px;
+}
+
+.auto-buy-list {
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.auto-buy {
+  padding: 12px 0;
+  border-top: 1px solid var(--border);
+}
+
+.auto-buy__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-weight: 600;
+}
+
+.auto-buy__next {
+  margin: 2px 0 0;
+  font-size: 0.85rem;
+}
+
+.auto-buy__runs {
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.85rem;
+}

@@ -277,7 +277,6 @@ export default function InvestHomePage() {
               <tr>
                 <th>{t('inv.colRank')}</th>
                 <th>{t('inv.colNickname')}</th>
-                <th className='num'>{t('inv.totalAssets')}</th>
                 <th className='num'>{t('inv.returnRate')}</th>
               </tr>
             </thead>
@@ -295,7 +294,6 @@ export default function InvestHomePage() {
                       withdrawn={row.nickname === WITHDRAWN}
                     />
                   </td>
-                  <td className='num'>{money(row.equity)}</td>
                   <td className={`num ${signClass(row.returnRate)}`}>
                     {formatRate(row.returnRate)}
                   </td>
